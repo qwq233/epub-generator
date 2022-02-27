@@ -22,5 +22,11 @@ tasks.withType<KotlinCompile> {
 }
 
 application {
-    mainClass.set("top.qwq23333.MainKt")
+    mainClass.set("top.qwq2333.MainKt")
+}
+
+tasks.withType<Jar>() {
+    manifest {
+        attributes["Main-Class"] = "top.qwq2333.MainKt"
+    }
 }
