@@ -1,0 +1,51 @@
+name: Build CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Gradle Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+          fetch-depth: 0
+      - name: Prepare Java 16
+        uses: actions/setup-java@v1
+        with:
+          java-version: 16
+          java-package: jdk
+
+      - name: Native Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/ccache
+            ~/.ccache
+          key: native-cache
+      - name: Gradle cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle
+          key: gradle-${{ hashFiles('**/*.gradle') }}
+      - name: Prepare Environment
+        run: |
+          sudo apt-get install bison gcc make curl ninja-build ccache -y
+
+      - name: Debug Build
+        run: |
+          ccache -zp
+          ccache -o max_size=10G
+          ccache -o hash_dir=false
+          ccache -o compiler_check='%compiler% -dumpmachine; %compiler% -dumpversion'
+          ./gradlew build
+          ccache -s
+            
