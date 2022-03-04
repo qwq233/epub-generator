@@ -20,37 +20,17 @@
  * <https://github.com/qwq233/qwq233/blob/master/eula.md>.
  */
 
-package top.qwq2333
+package top.qwq2333.config.data
 
-import com.charleskorn.kaml.Yaml
-import me.tongfei.progressbar.ProgressBar
-import top.qwq2333.config.data.Config
-import top.qwq2333.util.FileUtils
-import top.qwq2333.util.Utils
-import kotlin.system.exitProcess
+import kotlinx.serialization.Serializable
 
-fun main(args: Array<String>) {
-    if (args.size < 2) {
-        println("Usage: [Source Folder] [Target Folder]")
-        exitProcess(1)
-    }
-
-    val pgb = ProgressBar("Status", 100)
-    val source = args[0]
-    val target = args[1]
-
-    if (FileUtils.isExist(target)) {
-        FileUtils.delete(target)
-    }
-
-    println("Program arguments: ${args.joinToString()}")
-
-
-    println("Validating Config")
-    val cfg = Yaml.default.decodeFromString(Config.serializer(), FileUtils.read("$source/config.yml"))
-    Utils.validateConfig(cfg)
-    pgb.stepBy(10)
-    println("Config File is valid")
-
-
-}
+@Serializable
+data class Content(
+    val id: String,
+    val title: String? = null,
+    val noTitle: Boolean = false,
+    val type: String,
+    val path: String? = null,
+    val content: List<Content>? = null,
+    val hiddenInContent: Boolean = false
+)

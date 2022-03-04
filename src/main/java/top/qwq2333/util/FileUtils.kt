@@ -20,37 +20,38 @@
  * <https://github.com/qwq233/qwq233/blob/master/eula.md>.
  */
 
-package top.qwq2333
+package top.qwq2333.util
 
-import com.charleskorn.kaml.Yaml
-import me.tongfei.progressbar.ProgressBar
-import top.qwq2333.config.data.Config
-import top.qwq2333.util.FileUtils
-import top.qwq2333.util.Utils
-import kotlin.system.exitProcess
+import java.io.File
+import java.io.IOException
 
-fun main(args: Array<String>) {
-    if (args.size < 2) {
-        println("Usage: [Source Folder] [Target Folder]")
-        exitProcess(1)
+object FileUtils {
+
+    @JvmStatic
+    fun createFolder(path: String): Boolean = File(path).mkdir()
+
+    @JvmStatic
+    fun isExist(path: String): Boolean = File(path).isFile or File(path).isDirectory
+
+    @JvmStatic
+    fun write(path: String, msg: String) {
+        val target = File(path)
+        if (target.isDirectory) {
+            throw IOException("Target is a folder.")
+        }
+        target.writeText(msg, Charsets.UTF_8)
     }
 
-    val pgb = ProgressBar("Status", 100)
-    val source = args[0]
-    val target = args[1]
+    @JvmStatic
+    fun read(path: String) = File(path).readText(Charsets.UTF_8)
 
-    if (FileUtils.isExist(target)) {
-        FileUtils.delete(target)
+    @JvmStatic
+    fun delete(path: String) {
+        if (isExist(path))
+            return
+        val target = File(path)
+        if (target.isDirectory)
+            target.deleteRecursively()
+        target.delete()
     }
-
-    println("Program arguments: ${args.joinToString()}")
-
-
-    println("Validating Config")
-    val cfg = Yaml.default.decodeFromString(Config.serializer(), FileUtils.read("$source/config.yml"))
-    Utils.validateConfig(cfg)
-    pgb.stepBy(10)
-    println("Config File is valid")
-
-
 }

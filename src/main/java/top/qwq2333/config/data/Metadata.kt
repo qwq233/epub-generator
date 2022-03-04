@@ -20,37 +20,26 @@
  * <https://github.com/qwq233/qwq233/blob/master/eula.md>.
  */
 
-package top.qwq2333
+package top.qwq2333.config.data
 
-import com.charleskorn.kaml.Yaml
-import me.tongfei.progressbar.ProgressBar
-import top.qwq2333.config.data.Config
-import top.qwq2333.util.FileUtils
-import top.qwq2333.util.Utils
-import kotlin.system.exitProcess
+import kotlinx.serialization.Serializable
+import java.text.SimpleDateFormat
+import java.util.Date
 
-fun main(args: Array<String>) {
-    if (args.size < 2) {
-        println("Usage: [Source Folder] [Target Folder]")
-        exitProcess(1)
-    }
+@Serializable
+data class Metadata(
+    val title: String,
+    val creator: String,
+    val description: String,
+    val language: String,
+    val date: String = SimpleDateFormat("yyyy-M-dd").format(Date()),
+    val rights: String = "epub by $creator",
+    val cover: Cover
 
-    val pgb = ProgressBar("Status", 100)
-    val source = args[0]
-    val target = args[1]
-
-    if (FileUtils.isExist(target)) {
-        FileUtils.delete(target)
-    }
-
-    println("Program arguments: ${args.joinToString()}")
-
-
-    println("Validating Config")
-    val cfg = Yaml.default.decodeFromString(Config.serializer(), FileUtils.read("$source/config.yml"))
-    Utils.validateConfig(cfg)
-    pgb.stepBy(10)
-    println("Config File is valid")
-
-
+) {
+    @Serializable
+    data class Cover(
+        val hasCover: Boolean = false,
+        val image: String = ""
+    )
 }

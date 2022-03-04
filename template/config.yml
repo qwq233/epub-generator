@@ -13,25 +13,40 @@ metadata:
     rights: "epub by XXX" #
     cover:
         hasCover: true # boolean
-        image: image/cover.jpg
+        image: image/cover.jpg # path to image
 
 content:
-    copy-right:
-        no-title: true
-        type: text # Current available value is text and image
+    -   id: copy-right
+        noTitle: true
+        type: text # Current available value is text image and subcontent
         path: text/copyright-infomation.md # Path to markdown file.  Cannot be null
-        order: 1 # The default value is to set the order of chapter settings.
-    chapter-1:
+
+    -   id: chapter-1
         title: Chapter 1
         type: text
         path: text/chapter01.md
-        order: 2
-    illus:
-        no-title: true # The default vaule for image is true
+
+    -   id: illus
+        noTitle: true # The default vaule for image is true
         type: image
         path: image/illus.jpg
-    hidden-chapter:
+
+    -   id: hidden-chapter
         title: Hidden Chapter
         type: text
         path: text/hidden-chapter.md
-        hidden-in-content: true # If this is true, Table of Contents will not show this chapter.
+        hiddenInContent: true # If this is true, Table of Contents will not show this chapter.
+
+    -   id: subcontent-01
+        title: Sub Content
+        type: subcontent
+        content:
+            -   id: chapter-1
+                title: Chapter 1 In Sub content
+                type: text
+                path: text/chapter01.md
+
+            -   id: illus
+                title: Image in subcontent
+                type: image
+                path: image/illus.jpg
