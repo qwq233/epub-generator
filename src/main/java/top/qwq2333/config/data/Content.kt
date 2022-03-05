@@ -28,7 +28,6 @@ import kotlinx.serialization.Serializable
 data class Content(
     val id: String,
     val title: String? = null,
-    val noTitle: Boolean = false,
     val type: String,
     val path: String? = null,
     val content: List<Content>? = null,

@@ -23,6 +23,7 @@
 package top.qwq2333.util
 
 import top.qwq2333.config.data.Config
+import top.qwq2333.generate.XmlContent
 
 object Utils {
     @JvmStatic
@@ -32,7 +33,7 @@ object Utils {
             if (type == Defines.text) {
                 if (content.path == null)
                     throw IllegalStateException("Path for type text should not be empty")
-                if ((content.title == null) and !content.noTitle)
+                if ((content.title == null) and !content.hiddenInContent)
                     throw IllegalStateException("Title for type text should not be empty when noTitle is false")
             } else if (type == Defines.image) {
                 if (content.path == null)
@@ -52,7 +53,7 @@ object Utils {
      * @param path tmp path
      */
     @JvmStatic
-    fun prepareFile(path: String) {
+    fun prepareFile(path: String, cfg: Config) {
         val classloader = this::class.java.classLoader
 
         // main folders
@@ -70,7 +71,7 @@ object Utils {
         }
 
         // fonts
-        val fontPath = "$path/${Defines.mainfolder}/fonts"
+        val fontPath = "$path/${Defines.mainfolder}/Fonts"
         FileUtils.createFolder(fontPath)
         classloader.getResource("Fonts/author.ttf")!!.openStream().let {
             if (it != null) {
@@ -87,6 +88,9 @@ object Utils {
                 FileUtils.write("$fontPath/KaiGenGothicTC-Heavy.ttf", it)
             }
         }
+
+        FileUtils.write("$path/content.opf", XmlContent.genContent(cfg))
+        FileUtils.write("$path/toc.ncx", XmlContent.genTableOfContent(cfg))
 
 
     }

@@ -14,7 +14,7 @@ metadata:
 
 content:
     -   id: copy-right
-        noTitle: true
+        title: Copyright
         type: text # Current available value is text image and subcontent
         path: text/copyright-infomation.md # Path to markdown file.  Cannot be null
 
@@ -24,7 +24,7 @@ content:
         path: text/chapter01.md
 
     -   id: illus
-        noTitle: true # The default vaule for image is true
+        title: Copyright
         type: image
         path: image/illus.jpg
 

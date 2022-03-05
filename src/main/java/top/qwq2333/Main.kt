@@ -67,7 +67,7 @@ fun main(args: Array<String>) {
     Console.spaceLine()
 
     Console.printMsg("Generating base files.")
-    Utils.prepareFile(tmp)
+    Utils.prepareFile(tmp, cfg)
     Console.addProgress(10)
     Console.printMsg("Complete")
 

@@ -30,10 +30,10 @@ import java.util.Date
 data class Metadata(
     val title: String,
     val author: String,
-    val creator: String,
+    val creator: String = author,
     val description: String,
     val language: String,
-    val date: String = SimpleDateFormat("yyyy-M-dd").format(Date()),
+    val date: String = SimpleDateFormat("yyyy-M-d").format(Date()),
     val rights: String = "epub by $creator",
     val cover: Cover
 
