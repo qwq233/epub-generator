@@ -105,14 +105,14 @@ object XmlContent {
         val itemList: MutableList<String> = mutableListOf()
         cfg.content.forEach {
             if (it.type != Defines.subcontent || !it.hiddenInContent) {
-                val target = manifest.addElement("item")
-                target.addAttribute("id", it.id)
+                val item = manifest.addElement("item")
+                item.addAttribute("id", it.id)
                     .addAttribute("herf", "TODO")//TODO
                 if (it.type == Defines.text) {
                     itemList.add(it.id)
-                    target.addAttribute("media-type", "application/xhtml+xml")
+                    item.addAttribute("media-type", "application/xhtml+xml")
                 } else if (it.type == Defines.image) {
-                    target.addAttribute("media-type", "image/jpeg")
+                    item.addAttribute("media-type", "image/jpeg")
                 }
             }
         }
