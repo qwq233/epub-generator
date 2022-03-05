@@ -5,3 +5,4 @@ obj/
 app/.cxx
 *.iml
 local.properties
+output/

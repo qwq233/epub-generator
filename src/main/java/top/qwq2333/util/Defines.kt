@@ -23,7 +23,9 @@
 package top.qwq2333.util
 
 object Defines {
-    val text = "text"
-    val image = "image"
-    val subcontent = "subcontent"
+    const val text = "text"
+    const val image = "image"
+    const val subcontent = "subcontent"
+    const val mainfolder = "OEBPS"
+    const val manifest = "META-INF"
 }

@@ -39,18 +39,32 @@ fun main(args: Array<String>) {
     val source = args[0]
     val target = args[1]
 
-    if (FileUtils.isExist(target)) {
-        FileUtils.delete(target)
+    val tmp = "$target/tmp"
+
+    if ((FileUtils.isExist(target)) and (FileUtils.isExist(tmp))) {
+        FileUtils.delete(tmp)
+        FileUtils.createFolder(tmp)
+    } else {
+        if (FileUtils.isExist(target)) {
+            FileUtils.createFolder(tmp)
+        } else {
+            FileUtils.createFolder(target)
+            FileUtils.createFolder(tmp)
+        }
     }
 
     println("Program arguments: ${args.joinToString()}")
-
 
     println("Validating Config")
     val cfg = Yaml.default.decodeFromString(Config.serializer(), FileUtils.read("$source/config.yml"))
     Utils.validateConfig(cfg)
     pgb.stepBy(10)
-    println("Config File is valid")
+    println("Config File is valid\n")
+
+    println("Generating base files.")
+    FileUtils.prepareFile(tmp)
+    pgb.stepBy(10)
+    println("Complete\n")
 
 
 }
