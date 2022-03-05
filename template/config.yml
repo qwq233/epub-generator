@@ -1,11 +1,8 @@
 version: 1 # Configuration File version
 
-name: Demo
-description: details
-author: James Clef
-
 metadata:
     title: Demo # The default is the previously set name
+    author: James Clef
     creator: James Clef # The default is the previously set author
     description: details
     language: zh # Language

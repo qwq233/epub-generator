@@ -28,9 +28,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Config(
     val version: Int,
-    val name: String,
-    val description: String,
-    val author: String,
     val metadata: Metadata,
     val content: List<Content>
 )

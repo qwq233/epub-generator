@@ -29,6 +29,7 @@ import java.util.Date
 @Serializable
 data class Metadata(
     val title: String,
+    val author: String,
     val creator: String,
     val description: String,
     val language: String,
