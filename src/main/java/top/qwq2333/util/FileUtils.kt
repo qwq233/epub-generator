@@ -80,6 +80,7 @@ object FileUtils {
      * @param inputStream inputStream of source
      * @throws IOException If target has already existed or is a folder, then throw IOException
      */
+    @JvmStatic
     fun write(path: String, inputStream: InputStream) {
         val target = File(path)
         if (target.isDirectory) {
@@ -96,7 +97,8 @@ object FileUtils {
 
     /**
      * read text from file
-     * pat cannot point to a folder
+     *
+     * path cannot point to a folder
      * @param path path to target file
      */
     @JvmStatic
@@ -116,48 +118,5 @@ object FileUtils {
         target.delete()
     }
 
-    /**
-     * Prepare files for next step
-     * This will copy some const file from built-in resource
-     * @param path tmp path
-     */
-    @JvmStatic
-    fun prepareFile(path: String) {
-        val classloader = this::class.java.classLoader
 
-        // main folders
-        createFolder("$path/${Defines.manifest}")
-        createFolder("$path/${Defines.mainfolder}")
-
-        // minetype
-        classloader.getResource("minetype")?.readText(Charsets.UTF_8)?.let {
-            write("$path/minetype", it)
-        }
-
-        // container.xml
-        classloader.getResource("container.xml")?.readText(Charsets.UTF_8)?.let {
-            write("$path/${Defines.manifest}/container.xml", it)
-        }
-
-        // fonts
-        val fontPath = "$path/${Defines.mainfolder}/fonts"
-        createFolder(fontPath)
-        classloader.getResource("Fonts/author.ttf")!!.openStream().let {
-            if (it != null) {
-                write("$fontPath/author.ttf", it)
-            }
-        }
-        classloader.getResource("Fonts/title.ttf")!!.openStream().let {
-            if (it != null) {
-                write("$fontPath/title.ttf", it)
-            }
-        }
-        classloader.getResource("Fonts/KaiGenGothicTC-Heavy.ttf")!!.openStream().let {
-            if (it != null) {
-                write("$fontPath/KaiGenGothicTC-Heavy.ttf", it)
-            }
-        }
-
-
-    }
 }

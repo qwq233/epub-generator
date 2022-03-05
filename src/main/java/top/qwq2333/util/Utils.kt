@@ -46,5 +46,50 @@ object Utils {
         }
     }
 
+    /**
+     * Prepare files for next step.
+     * This will copy some const file from built-in resource
+     * @param path tmp path
+     */
+    @JvmStatic
+    fun prepareFile(path: String) {
+        val classloader = this::class.java.classLoader
+
+        // main folders
+        FileUtils.createFolder("$path/${Defines.manifest}")
+        FileUtils.createFolder("$path/${Defines.mainfolder}")
+
+        // minetype
+        classloader.getResource("minetype")?.readText(Charsets.UTF_8)?.let {
+            FileUtils.write("$path/minetype", it)
+        }
+
+        // container.xml
+        classloader.getResource("container.xml")?.readText(Charsets.UTF_8)?.let {
+            FileUtils.write("$path/${Defines.manifest}/container.xml", it)
+        }
+
+        // fonts
+        val fontPath = "$path/${Defines.mainfolder}/fonts"
+        FileUtils.createFolder(fontPath)
+        classloader.getResource("Fonts/author.ttf")!!.openStream().let {
+            if (it != null) {
+                FileUtils.write("$fontPath/author.ttf", it)
+            }
+        }
+        classloader.getResource("Fonts/title.ttf")!!.openStream().let {
+            if (it != null) {
+                FileUtils.write("$fontPath/title.ttf", it)
+            }
+        }
+        classloader.getResource("Fonts/KaiGenGothicTC-Heavy.ttf")!!.openStream().let {
+            if (it != null) {
+                FileUtils.write("$fontPath/KaiGenGothicTC-Heavy.ttf", it)
+            }
+        }
+
+
+    }
+
 }
 

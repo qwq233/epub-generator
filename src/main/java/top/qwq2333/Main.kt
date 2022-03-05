@@ -23,8 +23,8 @@
 package top.qwq2333
 
 import com.charleskorn.kaml.Yaml
-import me.tongfei.progressbar.ProgressBar
 import top.qwq2333.config.data.Config
+import top.qwq2333.util.Console
 import top.qwq2333.util.FileUtils
 import top.qwq2333.util.Utils
 import kotlin.system.exitProcess
@@ -35,11 +35,14 @@ fun main(args: Array<String>) {
         exitProcess(1)
     }
 
-    val pgb = ProgressBar("Status", 100)
     val source = args[0]
     val target = args[1]
 
     val tmp = "$target/tmp"
+
+    Thread {
+        Console.init()
+    }.start()
 
     if ((FileUtils.isExist(target)) and (FileUtils.isExist(tmp))) {
         FileUtils.delete(tmp)
@@ -53,18 +56,22 @@ fun main(args: Array<String>) {
         }
     }
 
-    println("Program arguments: ${args.joinToString()}")
+    Console.setTag("Config")
+    Console.printMsg("Program arguments: ${args.joinToString()}")
 
-    println("Validating Config")
+    Console.printMsg("Validating Config")
     val cfg = Yaml.default.decodeFromString(Config.serializer(), FileUtils.read("$source/config.yml"))
     Utils.validateConfig(cfg)
-    pgb.stepBy(10)
-    println("Config File is valid\n")
+    Console.addProgress(10)
+    Console.printMsg("Config File is valid")
+    Console.spaceLine()
 
-    println("Generating base files.")
-    FileUtils.prepareFile(tmp)
-    pgb.stepBy(10)
-    println("Complete\n")
+    Console.printMsg("Generating base files.")
+    Utils.prepareFile(tmp)
+    Console.addProgress(10)
+    Console.printMsg("Complete")
+
+    exitProcess(0)
 
 
 }

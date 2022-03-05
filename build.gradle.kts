@@ -39,7 +39,6 @@ repositories {
 val kotlinVersion = "1.6.20-M1"
 
 dependencies {
-    implementation("me.tongfei:progressbar:_")
     implementation("com.charleskorn.kaml:kaml:_")
     implementation("org.dom4j:dom4j:_")
     implementation("es.nitaur.markdown:txtmark:_")
