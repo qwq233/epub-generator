@@ -42,6 +42,7 @@ fun main(args: Array<String>) {
 
     val tmp = "$target/tmp"
 
+
     if ((FileUtils.isExist(target)) and (FileUtils.isExist(tmp))) {
         FileUtils.delete(tmp)
         FileUtils.createFolder(tmp)
@@ -63,8 +64,12 @@ fun main(args: Array<String>) {
     Console.printMsg("Config File is valid")
 
     Console.printMsg("Generating base files.")
+    
     Utils.prepareFile(tmp, cfg)
-    Console.printMsg("Complete")
+
+    if (FileUtils.isExist("$target/${cfg.metadata.title}.epub")) {
+        FileUtils.delete("$target/${cfg.metadata.title}.epub")
+    }
 
     HtmlContent.process(cfg.metadata, cfg.content, tmp, source)
     FileUtils.write(
@@ -74,6 +79,9 @@ fun main(args: Array<String>) {
     if (cfg.metadata.cover.hasCover) {
         HtmlContent.genCover(tmp, source, cfg.metadata)
     }
+
+    FileUtils.pack(tmp, "$target/${cfg.metadata.title}.epub")
+    Console.printMsg("Complete")
 
     exitProcess(0)
 

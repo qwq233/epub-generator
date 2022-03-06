@@ -27,6 +27,11 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 
 object FileUtils {
@@ -135,6 +140,22 @@ object FileUtils {
         }
         inputStream.close()
         return result!!
+    }
+
+
+    fun pack(sourceDirPath: String, zipFilePath: String) {
+        val p: Path = Files.createFile(Paths.get(zipFilePath))
+        ZipOutputStream(Files.newOutputStream(p)).use { zs ->
+            val pp: Path = Paths.get(sourceDirPath)
+            Files.walk(pp)
+                .filter { path -> !Files.isDirectory(path) }
+                .forEach { path ->
+                    val zipEntry = ZipEntry(pp.relativize(path).toString())
+                    zs.putNextEntry(zipEntry)
+                    Files.copy(path, zs)
+                    zs.closeEntry()
+                }
+        }
     }
 
 
