@@ -26,11 +26,20 @@ import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.ast.Node
 import com.vladsch.flexmark.util.data.MutableDataSet
+import org.dom4j.Document
+import org.dom4j.io.OutputFormat
+import org.dom4j.io.SAXReader
+import org.dom4j.io.XMLWriter
 import org.jetbrains.kotlin.konan.file.File
 import top.qwq2333.config.data.Content
 import top.qwq2333.util.Defines
 import top.qwq2333.util.FileUtils
+import top.qwq2333.util.Utils
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.FileInputStream
+import java.io.IOException
+
 
 object HtmlContent {
 
@@ -45,7 +54,7 @@ object HtmlContent {
             if (content.type == Defines.subcontent) {
                 process(metadata, content.content!!, targetPath, sourcePath)
             } else if (content.type == Defines.text) {
-                output = convertMdToHtml(FileUtils.read("$sourcePath/${content.path!!}"), content.title!!)
+                output = convertMdToHtml("$sourcePath/${content.path!!}", content.title!!, targetPath)
                 FileUtils.write("$targetPath/${Defines.mainfolder}/Text/${content.id}.xhtml", output)
             } else if (content.type == Defines.image) {
                 val fileExtension = content.path!!.split(File.pathSeparator).last().split(".").last()
@@ -107,7 +116,10 @@ object HtmlContent {
         return sb.toString()
     }
 
-    fun convertMdToHtml(content: String, title: String): String {
+    private fun convertMdToHtml(path: String, title: String, targetPath: String): String {
+        val content = FileUtils.read(path)
+
+
         var target = String()
         this::class.java.classLoader.getResource("Text/template.xhtml")!!.openStream().let {
             if (it != null) {
@@ -125,7 +137,34 @@ object HtmlContent {
         target = target.replace("TITLE", title)
         target = target.replace("TARGET", output)
 
-        return target
+        val reader = SAXReader()
+        val html: Document = reader.read(ByteArrayInputStream(target.toByteArray()))
+        html.rootElement.element("body").element("div").elements().forEach {
+            it.elements().forEach { element ->
+                if (element.name == "img") {
+                    if (Utils.isURL(element.attribute("src").value)) {
+                        throw UnsupportedOperationException("It don't support the image from internet.")
+                    }
+                    val value = element.attribute("src").value
+                    val sourceFile = File("${File(path).parent}/${value}")
+                    if (!sourceFile.isFile) {
+                        throw IOException("Image not found. Please check markdown file.")
+                    }
+                    FileUtils.write(
+                        "$targetPath/OEBPS/Images/${sourceFile.path.split(File.separator).last()}",
+                        FileInputStream(sourceFile.path)
+                    )
+                    element.attribute("src").value =
+                        "../Images/${sourceFile.path.split(File.separator).last()}"
+                }
+            }
+        }
+
+        val result = ByteArrayOutputStream()
+        val writer = XMLWriter(result, OutputFormat.createPrettyPrint())
+        writer.write(html)
+
+        return String(result.toByteArray())
     }
 }
 

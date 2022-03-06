@@ -68,7 +68,7 @@ object FileUtils {
             throw IOException("Target is a folder.")
         }
         if (target.isFile) {
-            throw IOException("Target has already existed")
+            Console.printMsg("Target file $path is already exist.")
         }
         val fos = target.outputStream()
         fos.write(msg.toByteArray())
@@ -90,7 +90,7 @@ object FileUtils {
             throw IOException("Target is a folder.")
         }
         if (target.isFile) {
-            throw IOException("Target has already existed")
+            Console.printMsg("WARN: Target file $path is already exist.")
         }
         val fos = target.outputStream()
         fos.write(inputStream.readAllBytes())
