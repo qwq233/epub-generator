@@ -28,7 +28,13 @@ import top.qwq2333.generate.XmlContent
 object Utils {
     @JvmStatic
     fun validateConfig(config: Config) {
+        val id: MutableList<String> = mutableListOf()
         for (content in config.content) {
+            if (!id.contains(content.id)) {
+                id.add(content.id)
+            } else {
+                throw IllegalStateException("One or more occurrences of the same Id")
+            }
             val type = content.type
             if (type == Defines.text) {
                 if (content.path == null)
@@ -44,6 +50,7 @@ object Utils {
             } else {
                 throw Exception("Unknown type \"$type\"")
             }
+
         }
     }
 
@@ -89,8 +96,19 @@ object Utils {
             }
         }
 
-        FileUtils.write("$path/content.opf", XmlContent.genContent(cfg))
-        FileUtils.write("$path/toc.ncx", XmlContent.genTableOfContent(cfg))
+        val stylesPath = "$path/${Defines.mainfolder}/${Defines.style}"
+        FileUtils.createFolder(stylesPath)
+        classloader.getResource("Styles/style.css")!!.openStream().let {
+            if (it != null) {
+                FileUtils.write("$stylesPath/style.css", it)
+            }
+        }
+
+        FileUtils.write("$path/${Defines.mainfolder}/content.opf", XmlContent.genContent(cfg))
+        FileUtils.write("$path/${Defines.mainfolder}/toc.ncx", XmlContent.genTableOfContent(cfg))
+
+        FileUtils.createFolder("$path/${Defines.mainfolder}/${Defines.textFolder}")
+        FileUtils.createFolder("$path/${Defines.mainfolder}/${Defines.imageFolder}")
 
 
     }

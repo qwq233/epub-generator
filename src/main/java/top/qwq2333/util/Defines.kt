@@ -28,4 +28,18 @@ object Defines {
     const val subcontent = "subcontent"
     const val mainfolder = "OEBPS"
     const val manifest = "META-INF"
+    const val style = "Styles"
+    const val textFolder = "Text"
+    const val imageFolder = "Images"
+
+    fun contentFull(element: String) =
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+            "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"  \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">" +
+            "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"zh-CN\" xmlns:epub=\"http://www.idpf.org/2007/ops\">" +
+            "<head>  <link href=\"../Styles/style.css\" rel=\"stylesheet\" type=\"text/css\"/>" +
+            "<title>Contents</title>" +
+            "</head><body><div> <p class=\"contents em12\">CONTENTS</p>$element</div></body></html>"
+
+    fun contentElement(href: String, title: String): String =
+        "<p class=\"content\"><a class=\"no-d co20 bold\" href=\"$href\">$title</a></p>"
 }

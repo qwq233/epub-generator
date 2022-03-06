@@ -22,9 +22,12 @@
 
 package top.qwq2333.util
 
+import java.io.BufferedReader
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import java.io.InputStreamReader
+
 
 object FileUtils {
 
@@ -116,6 +119,22 @@ object FileUtils {
         if (target.isDirectory)
             target.deleteRecursively()
         target.delete()
+    }
+
+    /**
+     * convert InputStream to String
+     * @param inputStream target
+     * @return result
+     */
+    fun convertInputStreamToString(inputStream: InputStream): String {
+        val bufferedReader = BufferedReader(InputStreamReader(inputStream))
+        var line: String? = ""
+        var result: String? = ""
+        while (bufferedReader.readLine().also { line = it } != null) {
+            result += line
+        }
+        inputStream.close()
+        return result!!
     }
 
 

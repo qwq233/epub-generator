@@ -24,7 +24,9 @@ package top.qwq2333
 
 import com.charleskorn.kaml.Yaml
 import top.qwq2333.config.data.Config
+import top.qwq2333.generate.HtmlContent
 import top.qwq2333.util.Console
+import top.qwq2333.util.Defines
 import top.qwq2333.util.FileUtils
 import top.qwq2333.util.Utils
 import kotlin.system.exitProcess
@@ -39,10 +41,6 @@ fun main(args: Array<String>) {
     val target = args[1]
 
     val tmp = "$target/tmp"
-
-    Thread {
-        Console.init()
-    }.start()
 
     if ((FileUtils.isExist(target)) and (FileUtils.isExist(tmp))) {
         FileUtils.delete(tmp)
@@ -62,14 +60,20 @@ fun main(args: Array<String>) {
     Console.printMsg("Validating Config")
     val cfg = Yaml.default.decodeFromString(Config.serializer(), FileUtils.read("$source/config.yml"))
     Utils.validateConfig(cfg)
-    Console.addProgress(10)
     Console.printMsg("Config File is valid")
-    Console.spaceLine()
 
     Console.printMsg("Generating base files.")
     Utils.prepareFile(tmp, cfg)
-    Console.addProgress(10)
     Console.printMsg("Complete")
+
+    HtmlContent.process(cfg.metadata, cfg.content, tmp, source)
+    FileUtils.write(
+        "$tmp/${Defines.mainfolder}/Text/contents.xhtml",
+        HtmlContent.genToC(HtmlContent.genToCElement(cfg.content))
+    )
+    if (cfg.metadata.cover.hasCover) {
+        HtmlContent.genCover(tmp, source, cfg.metadata)
+    }
 
     exitProcess(0)
 

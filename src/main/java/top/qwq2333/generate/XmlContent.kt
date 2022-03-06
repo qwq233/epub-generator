@@ -27,6 +27,7 @@ import org.dom4j.Element
 import org.dom4j.io.OutputFormat
 import org.dom4j.io.XMLWriter
 import org.dom4j.tree.DefaultDocumentType
+import org.jetbrains.kotlin.konan.file.File
 import top.qwq2333.config.data.Config
 import top.qwq2333.config.data.Content
 import top.qwq2333.util.Defines
@@ -48,9 +49,8 @@ object XmlContent {
      */
     fun genContent(cfg: Config): String {
         val target = DocumentHelper.createDocument()
-        val rootElement = target.addElement("package")
-        rootElement.addAttribute("xmlns", "http://purl.org/dc/elements/1.1/")
-            .addAttribute("version", "2.0")
+        val rootElement = target.addElement("package", "http://www.idpf.org/2007/opf")
+        rootElement.addAttribute("version", "2.0")
             .addAttribute("unique-identifier", "BookId")
 
         val metadata = rootElement.addElement("metadata")
@@ -88,51 +88,80 @@ object XmlContent {
         if (cfg.metadata.cover.hasCover) {
             metadata.addElement("meta")
                 .addAttribute("name", "cover")
-                .addAttribute("content", cfg.metadata.cover.image)
+                .addAttribute(
+                    "content",
+                    "cover"
+                )
         }
 
         val manifest = rootElement.addElement("manifest")
         manifest.addElement("item")
             .addAttribute("id", "ncx")
-            .addAttribute("herf", "toc.ncx")
             .addAttribute("media-type", "application/x-dtbncx+xml")
-        listOf("author.ttf", "KaiGenGothicTC-Heavy.ttf", "title.ttf").forEach {
-            metadata.addElement("item")
-                .addAttribute("id", it)
-                .addAttribute("herf", "Fonts/$it")
-                .addAttribute("media-type", "font/ttf")
-        }
+            .addAttribute("href", "toc.ncx")
+        manifest.addElement("item")
+            .addAttribute("id", "minetype")
+            .addAttribute("href", "../minetype")
+            .addAttribute("media-type", "application/octet-stream")
+        manifest.addElement("item")
+            .addAttribute("id", "css")
+            .addAttribute("href", "Styles/style.css")
+            .addAttribute("media-type", "text/css")
+
+
         val itemList: MutableList<String> = mutableListOf()
-        cfg.content.forEach {
-            if (it.type != Defines.subcontent || !it.hiddenInContent) {
-                val item = manifest.addElement("item")
-                item.addAttribute("id", it.id)
-                    .addAttribute("herf", "TODO")//TODO
-                if (it.type == Defines.text) {
-                    itemList.add(it.id)
-                    item.addAttribute("media-type", "application/xhtml+xml")
-                } else if (it.type == Defines.image) {
-                    item.addAttribute("media-type", "image/jpeg")
-                }
+
+        if (cfg.metadata.cover.hasCover) {
+            val extension = cfg.metadata.cover.image.split(File.pathSeparator).last().split(".").last()
+
+            val item = manifest.addElement("item")
+            item.addAttribute("id", "cover")
+                .addAttribute("href", "Images/cover.$extension")
+
+            val item2 = manifest.addElement("item")
+            item2.addAttribute("id", "cover-xhtml")
+                .addAttribute("href", "Text/cover.xhtml")
+                .addAttribute("media-type", "application/xhtml+xml")
+            itemList.add("cover-xhtml")
+
+            when (extension) {
+                "jpg" -> item.addAttribute("media-type", "image/jpeg")
+                "png" -> item.addAttribute("media-type", "image/png")
+                else -> item.addAttribute("media-type", "image/$extension")
             }
         }
+
+        listOf("author.ttf", "KaiGenGothicTC-Heavy.ttf", "title.ttf").forEach {
+            manifest.addElement("item")
+                .addAttribute("id", it)
+                .addAttribute("media-type", "application/x-font-truetype")
+                .addAttribute("href", "Fonts/$it")
+        }
+        manifest.addElement("item")
+            .addAttribute("id", "contents")
+            .addAttribute("href", "Text/contents.xhtml")
+            .addAttribute("media-type", "application/xhtml+xml")
+
+        genManifestElement(manifest, cfg.content, itemList)
 
         val spine = rootElement.addElement("spine").addAttribute("toc", "ncx")
         itemList.forEach {
             spine.addElement("itemref")
                 .addAttribute("idref", it)
         }
+        spine.addElement("itemref")
+            .addAttribute("idref", "contents")
 
         val guide = rootElement.addElement("guide")
         guide.addElement("reference")
             .addAttribute("type", "toc")
             .addAttribute("title", "Table of Contents")
-            .addAttribute("herf", "Text/contents.xhtml")
+            .addAttribute("href", "Text/contents.xhtml")
         if (cfg.metadata.cover.hasCover) {
             guide.addElement("reference")
                 .addAttribute("type", "cover")
                 .addAttribute("title", "Cover")
-                .addAttribute("herf", "TODO")//TODO
+                .addAttribute("href", "Text/cover.xhtml")
         }
 
         val output = ByteArrayOutputStream()
@@ -217,13 +246,47 @@ object XmlContent {
                 .addAttribute("playOrder", "${order++}")
             if (content.type == Defines.subcontent) {
                 target.addElement("navLabel").addElement("text").text = content.title!!
-                target.addElement("content").addAttribute("src", content.content!![0].path!!)
+                target.addElement("content").addAttribute("src", "Text/${content.content!![0].id}.xhtml")
                 genNavPoint(content.content, target)
             } else {
                 target.addElement("navLabel").addElement("text").text = content.title!!
-                target.addElement("content").addAttribute("src", content.path!!)
+                target.addElement("content").addAttribute("src", "Text/${content.id}.xhtml")
             }
         }
+    }
+
+    fun genManifestElement(manifest: Element, contents: List<Content>, itemList: MutableList<String>) {
+        contents.forEach {
+            if (it.type != Defines.subcontent) {
+                val item = manifest.addElement("item")
+                item.addAttribute("id", it.id)
+                if (it.type == Defines.text) {
+                    if (!it.hiddenInContent)
+                        itemList.add(it.id)
+                    item.addAttribute("media-type", "application/xhtml+xml")
+                    item.addAttribute("href", "Text/${it.id}.xhtml")
+                } else if (it.type == Defines.image) {
+                    if (!it.hiddenInContent)
+                        itemList.add(it.id)
+                    item.addAttribute("media-type", "application/xhtml+xml")
+                    item.addAttribute("href", "Text/${it.id}.xhtml")
+
+                    val extension = it.path!!.split(File.pathSeparator).last().split(".").last()
+                    val item2 = manifest.addElement("item")
+                    item2.addAttribute("id", "${it.id}-image")
+                        .addAttribute("href", "Images/${it.id}.$extension")
+
+                    when (extension) {
+                        "jpg" -> item2.addAttribute("media-type", "image/jpeg")
+                        "png" -> item2.addAttribute("media-type", "image/png")
+                        else -> item2.addAttribute("media-type", "image/$extension")
+                    }
+                }
+            } else {
+                genManifestElement(manifest, it.content!!, itemList)
+            }
+        }
+
     }
 
 }

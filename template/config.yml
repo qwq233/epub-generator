@@ -24,7 +24,7 @@ content:
         path: text/chapter01.md
 
     -   id: illus
-        title: Copyright
+        title: Illus
         type: image
         path: image/illus.jpg
 
@@ -38,12 +38,12 @@ content:
         title: Sub Content
         type: subcontent
         content:
-            -   id: chapter-1
+            -   id: sub-chapter-1
                 title: Chapter 1 In Sub content
                 type: text
                 path: text/chapter01.md
 
-            -   id: illus
+            -   id: sub-illus
                 title: Image in subcontent
                 type: image
                 path: image/illus.jpg

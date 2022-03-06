@@ -1,0 +1,400 @@
+/*
+ * EPUB Generator
+ * Copyright (C) 2022 qwq233 qwq233@qwq2333.top
+ * https://github.com/qwq233/epub-generator
+ *
+ * This software is non-free but opensource software: you can redistribute it
+ * and/or modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation; either
+ * version 3 of the License, or any later version and our eula as published
+ * by qwq233.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * and eula along with this software.  If not, see
+ * <https://www.gnu.org/licenses/>
+ * <https://github.com/qwq233/qwq233/blob/master/eula.md>.
+ */
+
+body {
+    padding: 0%;
+    margin-top: 0%;
+    margin-bottom: 0%;
+    margin-left: 1%;
+    margin-right: 1%;
+    line-height: 120%;
+    text-align: justify;
+}
+
+h4 {
+    font-size: 1.5em;
+    text-align: center;
+    line-height: 1.2em;
+    text-indent: 0;
+    font-weight: bold;
+    margin-top: 1em;
+    margin-bottom: 1.5em;
+    font-family: "Microsoft YaHei";
+}
+
+div {
+    margin: 0;
+    padding: 0;
+    text-align: justify;
+}
+
+p {
+    text-indent: 2em;
+    display: block;
+    line-height: 1.3em;
+    margin-top: 0.4em;
+    margin-bottom: 0.4em;
+}
+
+/*图片相关*/
+.illus {
+    text-indent: 0;
+    text-align: center;
+}
+
+.cover {
+    margin: 0;
+    padding: 0;
+    text-indent: 0;
+    text-align: center;
+}
+
+.coverborder {
+    border-style: none solid none solid;
+    border-color: #000;
+    border-width: 1px;
+}
+
+/*预设格式相关样式*/
+.right {
+    text-indent: 0;
+    text-align: right;
+}
+
+.left {
+    text-indent: 0;
+    text-align: left;
+}
+
+.center {
+    text-indent: 0;
+    text-align: center;
+}
+
+.zin {
+    text-indent: 0;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.stress {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-top: 0.3em;
+    margin-bottom: 0.3em;
+}
+
+.authors {
+    font-size: 1.2em;
+    text-align: right;
+    font-weight: bold;
+    font-style: italic;
+    margin-right: 1em;
+}
+
+.dash-break {
+    word-break: break-all;
+    word-wrap: break-word;
+}
+
+.no-d {
+    text-decoration: none;
+}
+
+.bc {
+    border-collapse: collapse;
+}
+
+.dash-break {
+    word-break: break-all;
+    word-wrap: break-word;
+}
+
+.message {
+    text-indent: 0;
+    line-height: 1.2em;
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
+}
+
+.meg {
+    font-size: 1.3em;
+    text-indent: 0;
+    font-weight: bold;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+/*文字大小*/
+.em05 {
+    font-size: 0.5em;
+}
+
+.em06 {
+    font-size: 0.6em;
+}
+
+.em07 {
+    font-size: 0.7em;
+}
+
+.em08 {
+    font-size: 0.8em;
+}
+
+.em09 {
+    font-size: 0.9em;
+}
+
+.em10 {
+    font-size: 1em;
+}
+
+.em11 {
+    font-size: 1.1em;
+}
+
+.em12 {
+    font-size: 1.2em;
+}
+
+.em13 {
+    font-size: 1.3em;
+}
+
+.em14 {
+    font-size: 1.4em;
+}
+
+.em15 {
+    font-size: 1.5em;
+}
+
+.em16 {
+    font-size: 1.6em;
+}
+
+.em17 {
+    font-size: 1.7em;
+}
+
+.em18 {
+    font-size: 1.8em;
+}
+
+.em18 {
+    font-size: 1.9em;
+}
+
+.em20 {
+    font-size: 2em;
+}
+
+.em25 {
+    font-size: 2.5em;
+}
+
+.em30 {
+    font-size: 3em;
+}
+
+/*字体样式*/
+@font-face {
+    font-family: "KaiGen Gothic TC Heavy";
+    src: url(../Fonts/KaiGenGothicTC-Heavy.ttf);
+}
+
+.fft {
+    font-family: "KaiGen Gothic TC Heavy";
+}
+
+@font-face {
+    font-family: H-ShinYaLan;
+    src: url(../Fonts/title.ttf);
+}
+
+.title {
+    font-family: H-ShinYaLan;
+}
+
+@font-face {
+    font-family: "Microsoft YaHei";
+    src: url(../Fonts/author.ttf);
+}
+
+.author {
+    font-family: "Microsoft YaHei";
+}
+
+.contents {
+    text-indent: 0;
+    text-align: center;
+    border-bottom: 0.1em dotted #000;
+    padding: 0.5em 0 0.4em 0;
+    margin-bottom: 0.7em;
+    font-weight: bold;
+}
+
+.content {
+    text-indent: 0;
+    text-align: left;
+    margin-left: 4em;
+}
+
+.co20 {
+    color: #000;
+}
+
+/*预设title样式*/
+.title-width {
+    width: 100%;
+}
+
+.bb {
+    border-bottom: 3px solid #000;
+}
+
+.blb {
+    border-left: 3px solid #000;
+    border-bottom: 3px solid #000;
+}
+
+.bl {
+    border-left: 3px solid #000;
+}
+
+.br {
+    border-right: 3px solid #000;
+}
+
+.brt {
+    border-right: 3px solid #000;
+    border-top: 3px solid #000;
+}
+
+.bt {
+    border-top: 3px solid #000;
+}
+
+.tico1 {
+    color: #31308D;
+}
+
+.tico2 {
+    color: #000;
+}
+
+.tico3 {
+    color: #F8BE03;
+}
+
+.fl {
+    float: left;
+}
+
+.fr {
+    float: right;
+}
+
+.ml1 {
+    margin-right: 1em;
+}
+
+.ml2 {
+    margin-right: 0.5em;
+}
+
+.mr1 {
+    margin-right: 7em;
+}
+
+.mr2 {
+    margin-right: -5.4em;
+}
+
+.mr3 {
+    margin-right: -0.5em;
+}
+
+.mr4 {
+    margin-right: -2.7em;
+}
+
+.mr5 {
+    margin-right: -1.3em;
+}
+
+.mt1 {
+    margin-top: 2.5em;
+}
+
+.mt2 {
+    margin-top: 2em;
+}
+
+.mt3 {
+    margin-top: 5.2em;
+}
+
+.mt4 {
+    margin-top: 1.6em;
+}
+
+.mt5 {
+    margin-top: 5em;
+}
+
+.mt6 {
+    margin-top: 9.6em;
+}
+
+.lh {
+    line-height: 0.7em;
+}
+
+.lh1 {
+    line-height: 0.75em;
+}
+
+.lh2 {
+    margin-top: -0.6em;
+    margin-bottom: 0.05em;
+}
+
+.sign {
+    font-size: 0.8em;
+    font-weight: bold;
+    vertical-align: super;
+}
+
+.note {
+    font-size: 0.8em;
+    text-indent: -1.6em;
+    margin: 0.5em 2% 1em 2.5em;
+    padding: 0.8em 0.8em 0.8em 1.9em;
+    background-color: #F1D99D;
+    border: 1px #BC905A solid;
+    border-radius: 0 10px;
+    box-shadow: 2px 2px 4px #555;
+}
