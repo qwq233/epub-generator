@@ -106,6 +106,9 @@ object HtmlContent {
     fun genToCElement(list: List<Content>): String {
         val sb = StringBuilder()
         for (content in list) {
+            if (content.hiddenInContent){
+                continue
+            }
             if (content.type == Defines.subcontent) {
                 sb.append(genToCElement(content.content!!))
             }
