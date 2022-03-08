@@ -261,13 +261,11 @@ object XmlContent {
                 val item = manifest.addElement("item")
                 item.addAttribute("id", it.id)
                 if (it.type == Defines.text) {
-                    if (!it.hiddenInContent)
-                        itemList.add(it.id)
+                    itemList.add(it.id)
                     item.addAttribute("media-type", "application/xhtml+xml")
                     item.addAttribute("href", "Text/${it.id}.xhtml")
                 } else if (it.type == Defines.image) {
-                    if (!it.hiddenInContent)
-                        itemList.add(it.id)
+                    itemList.add(it.id)
                     item.addAttribute("media-type", "application/xhtml+xml")
                     item.addAttribute("href", "Text/${it.id}.xhtml")
 
