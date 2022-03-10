@@ -22,6 +22,7 @@
 
 package top.qwq2333.generate
 
+import org.dom4j.Document
 import org.dom4j.DocumentHelper
 import org.dom4j.Element
 import org.dom4j.io.OutputFormat
@@ -32,11 +33,10 @@ import top.qwq2333.config.data.Config
 import top.qwq2333.config.data.Content
 import top.qwq2333.util.Defines
 import java.io.ByteArrayOutputStream
-import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.util.UUID
 
-object XmlContent {
+object XMLContent {
     private var depth = 1
     private var currentDepth = 1
     private var order = 1
@@ -47,7 +47,7 @@ object XmlContent {
      * @param cfg config
      * @return xml content to write to file
      */
-    fun genContent(cfg: Config): String {
+    fun genContent(cfg: Config): Document {
         val target = DocumentHelper.createDocument()
         val rootElement = target.addElement("package", "http://www.idpf.org/2007/opf")
         rootElement.addAttribute("version", "2.0")
@@ -82,9 +82,12 @@ object XmlContent {
         metadata.addElement("meta")
             .addAttribute("name", "calibre:title_sort")
             .addAttribute("content", cfg.metadata.title)
+        val contributor = metadata.addElement("dc:contributor")
+        contributor.addAttribute("opf:role", "bkp")
+        contributor.text = "EPUB Generator [https://github.com/qwq233/epub-generator] by James Clef [https://qwq2333.top/]"
         metadata.addElement("meta")
             .addAttribute("name", "calibre:author_link_map")
-            .addAttribute("content", "{&quot;${URLEncoder.encode(cfg.metadata.author, "UTF-8")}&quot;: &quot;&quot;}")
+            .addAttribute("content", "{&quot;${cfg.metadata.author}&quot;: &quot;&quot;}")
         if (cfg.metadata.cover.hasCover) {
             metadata.addElement("meta")
                 .addAttribute("name", "cover")
@@ -99,10 +102,12 @@ object XmlContent {
             .addAttribute("id", "ncx")
             .addAttribute("media-type", "application/x-dtbncx+xml")
             .addAttribute("href", "toc.ncx")
+        /*
         manifest.addElement("item")
-            .addAttribute("id", "minetype")
-            .addAttribute("href", "../minetype")
+            .addAttribute("id", "mimetype")
+            .addAttribute("href", "../mimetype")
             .addAttribute("media-type", "application/octet-stream")
+         */
         manifest.addElement("item")
             .addAttribute("id", "css")
             .addAttribute("href", "Styles/style.css")
@@ -164,11 +169,7 @@ object XmlContent {
                 .addAttribute("href", "Text/cover.xhtml")
         }
 
-        val output = ByteArrayOutputStream()
-        val writer = XMLWriter(output, OutputFormat.createPrettyPrint())
-        writer.write(target)
-
-        return String(output.toByteArray())
+        return target
     }
 
     /**
@@ -178,14 +179,13 @@ object XmlContent {
      */
     fun genTableOfContent(cfg: Config): String {
         val target = DocumentHelper.createDocument()
-        val rootElement = target.addElement("ncx")
+        val rootElement = target.addElement("ncx", "http://www.daisy.org/z3986/2005/ncx/")
         target.docType = DefaultDocumentType(
             "ncx",
             "-//NISO//DTD ncx 2005-1//EN",
             "http://www.daisy.org/z3986/2005/ncx-2005-1.dtd"
         )
 
-        rootElement.addAttribute("xmlns", "http://www.daisy.org/z3986/2005/ncx/")
         rootElement.addAttribute("version", "2005-1")
         rootElement.addAttribute("xml:lang", cfg.metadata.language)
 
@@ -231,7 +231,7 @@ object XmlContent {
                     depth = currentDepth
                 checkDepth(it.content!!)
             } else {
-                currentDepth = 1
+                currentDepth = 0
             }
         }
     }
@@ -242,7 +242,7 @@ object XmlContent {
                 continue
             }
             val target = parentElement.addElement("navPoint")
-                .addAttribute("id", "num_${order}")
+                .addAttribute("id", "navPoint_${order}")
                 .addAttribute("playOrder", "${order++}")
             if (content.type == Defines.subcontent) {
                 target.addElement("navLabel").addElement("text").text = content.title!!

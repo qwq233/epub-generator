@@ -23,7 +23,7 @@
 package top.qwq2333.util
 
 import top.qwq2333.config.data.Config
-import top.qwq2333.generate.XmlContent
+import top.qwq2333.generate.XMLContent
 import java.util.Locale
 
 object Utils {
@@ -68,9 +68,9 @@ object Utils {
         FileUtils.createFolder("$path/${Defines.manifest}")
         FileUtils.createFolder("$path/${Defines.mainfolder}")
 
-        // minetype
-        classloader.getResource("minetype")?.readText(Charsets.UTF_8)?.let {
-            FileUtils.write("$path/minetype", it)
+        // mimetype
+        classloader.getResource("mimetype")?.readText(Charsets.UTF_8)?.let {
+            FileUtils.write("$path/mimetype", it)
         }
 
         // container.xml
@@ -105,8 +105,8 @@ object Utils {
             }
         }
 
-        FileUtils.write("$path/${Defines.mainfolder}/content.opf", XmlContent.genContent(cfg))
-        FileUtils.write("$path/${Defines.mainfolder}/toc.ncx", XmlContent.genTableOfContent(cfg))
+
+        FileUtils.write("$path/${Defines.mainfolder}/toc.ncx", XMLContent.genTableOfContent(cfg))
 
         FileUtils.createFolder("$path/${Defines.mainfolder}/${Defines.textFolder}")
         FileUtils.createFolder("$path/${Defines.mainfolder}/${Defines.imageFolder}")

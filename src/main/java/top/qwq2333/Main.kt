@@ -23,12 +23,16 @@
 package top.qwq2333
 
 import com.charleskorn.kaml.Yaml
+import org.dom4j.io.OutputFormat
+import org.dom4j.io.XMLWriter
 import top.qwq2333.config.data.Config
-import top.qwq2333.generate.HtmlContent
+import top.qwq2333.generate.HTMLContent
+import top.qwq2333.generate.XMLContent
 import top.qwq2333.util.Console
 import top.qwq2333.util.Defines
 import top.qwq2333.util.FileUtils
 import top.qwq2333.util.Utils
+import java.io.ByteArrayOutputStream
 import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
@@ -64,20 +68,28 @@ fun main(args: Array<String>) {
     Console.printMsg("Config File is valid")
 
     Console.printMsg("Generating base files.")
-    
+
     Utils.prepareFile(tmp, cfg)
 
     if (FileUtils.isExist("$target/${cfg.metadata.title}.epub")) {
         FileUtils.delete("$target/${cfg.metadata.title}.epub")
     }
+    val content = XMLContent.genContent(cfg)
+    HTMLContent.process(cfg.metadata, cfg.content, tmp, source, content)
 
-    HtmlContent.process(cfg.metadata, cfg.content, tmp, source)
+    val output = ByteArrayOutputStream()
+    val writer = XMLWriter(output, OutputFormat.createPrettyPrint())
+    writer.write(content)
+
+    FileUtils.write("$tmp/${Defines.mainfolder}/content.opf", String(output.toByteArray()) )
+
+
     FileUtils.write(
         "$tmp/${Defines.mainfolder}/Text/contents.xhtml",
-        HtmlContent.genToC(HtmlContent.genToCElement(cfg.content))
+        HTMLContent.genToC(HTMLContent.genToCElement(cfg.content))
     )
     if (cfg.metadata.cover.hasCover) {
-        HtmlContent.genCover(tmp, source, cfg.metadata)
+        HTMLContent.genCover(tmp, source, cfg.metadata)
     }
 
     FileUtils.pack(tmp, "$target/${cfg.metadata.title}.epub")

@@ -30,6 +30,7 @@ import org.dom4j.Document
 import org.dom4j.io.OutputFormat
 import org.dom4j.io.SAXReader
 import org.dom4j.io.XMLWriter
+import org.dom4j.tree.DefaultDocumentType
 import org.jetbrains.kotlin.konan.file.File
 import top.qwq2333.config.data.Content
 import top.qwq2333.util.Defines
@@ -41,20 +42,21 @@ import java.io.FileInputStream
 import java.io.IOException
 
 
-object HtmlContent {
+object HTMLContent {
 
     fun process(
         metadata: top.qwq2333.config.data.Metadata,
         contents: List<Content>,
         targetPath: String,
-        sourcePath: String
+        sourcePath: String,
+        document: Document
     ) {
         for (content in contents) {
             var output: String = "null"
             if (content.type == Defines.subcontent) {
-                process(metadata, content.content!!, targetPath, sourcePath)
+                process(metadata, content.content!!, targetPath, sourcePath, document)
             } else if (content.type == Defines.text) {
-                output = convertMdToHtml("$sourcePath/${content.path!!}", content.title!!, targetPath)
+                output = convertMdToHtml("$sourcePath/${content.path!!}", content.title!!, targetPath, document)
                 FileUtils.write("$targetPath/${Defines.mainfolder}/Text/${content.id}.xhtml", output)
             } else if (content.type == Defines.image) {
                 val fileExtension = content.path!!.split(File.pathSeparator).last().split(".").last()
@@ -106,7 +108,7 @@ object HtmlContent {
     fun genToCElement(list: List<Content>): String {
         val sb = StringBuilder()
         for (content in list) {
-            if (content.hiddenInContent){
+            if (content.hiddenInContent) {
                 continue
             }
             if (content.type == Defines.subcontent) {
@@ -119,7 +121,7 @@ object HtmlContent {
         return sb.toString()
     }
 
-    private fun convertMdToHtml(path: String, title: String, targetPath: String): String {
+    private fun convertMdToHtml(path: String, title: String, targetPath: String, document: Document): String {
         val content = FileUtils.read(path)
 
 
@@ -134,14 +136,22 @@ object HtmlContent {
         val parser = Parser.builder(options).build()
         val renderer = HtmlRenderer.builder(options).build()
 
-        val document: Node = parser.parse(content)
-        val output = renderer.render(document)
+        val node: Node = parser.parse(content)
+        val output = renderer.render(node)
 
         target = target.replace("TITLE", title)
         target = target.replace("TARGET", output)
 
         val reader = SAXReader()
         val html: Document = reader.read(ByteArrayInputStream(target.toByteArray()))
+        val type = DefaultDocumentType(
+            html.rootElement.name,
+            "-//W3C//DTD XHTML 1.1//EN",
+            "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"
+        );
+        html.docType = type
+        html.rootElement.addNamespace("epub", "http://www.idpf.org/2007/ops")
+        html.rootElement.addNamespace("xml", "http://www.w3.org/XML/1998/namespace")
         html.rootElement.element("body").element("div").elements().forEach {
             it.elements().forEach { element ->
                 if (element.name == "img") {
@@ -153,12 +163,24 @@ object HtmlContent {
                     if (!sourceFile.isFile) {
                         throw IOException("Image not found. Please check markdown file.")
                     }
+                    val fileName = sourceFile.path.split(File.separator).last()
                     FileUtils.write(
-                        "$targetPath/OEBPS/Images/${sourceFile.path.split(File.separator).last()}",
+                        "$targetPath/OEBPS/Images/$fileName",
                         FileInputStream(sourceFile.path)
                     )
                     element.attribute("src").value =
                         "../Images/${sourceFile.path.split(File.separator).last()}"
+
+                    val item = document.rootElement.element("manifest")
+                        .addElement("item")
+                    item.addAttribute("id", "image-${fileName.split(".")[0]}")
+                    item.addAttribute("href","Images/${sourceFile.path.split(File.separator).last()}")
+
+                    when (val extension = fileName.split(".")[1]) {
+                        "jpg" -> item.addAttribute("media-type", "image/jpeg")
+                        "png" -> item.addAttribute("media-type", "image/png")
+                        else -> item.addAttribute("media-type", "image/$extension")
+                    }
                 }
             }
         }
