@@ -30,7 +30,7 @@ plugins {
 }
 
 group = "top.qwq2333"
-version = "1.0.1"
+version = "1.0.2"
 
 repositories {
     mavenCentral()
