@@ -38,9 +38,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 object XMLContent {
-    private var depth = 1
-    private var currentDepth = 1
-    private var order = 1
+    private var depth = 0
+    private var currentDepth = 0
+    private var order = 0
     private val uuid = UUID.randomUUID()
 
     /**

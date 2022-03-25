@@ -129,7 +129,7 @@ object FileUtils {
      */
     fun convertInputStreamToString(inputStream: InputStream): String {
         val bufferedReader = BufferedReader(InputStreamReader(inputStream))
-        var line: String? = ""
+        var line: String?
         var result: String? = ""
         while (bufferedReader.readLine().also { line = it } != null) {
             result += line
