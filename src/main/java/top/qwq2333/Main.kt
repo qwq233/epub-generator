@@ -28,7 +28,6 @@ import org.dom4j.io.XMLWriter
 import top.qwq2333.config.data.Config
 import top.qwq2333.generate.HTMLContent
 import top.qwq2333.generate.XMLContent
-import top.qwq2333.util.Console
 import top.qwq2333.util.Defines
 import top.qwq2333.util.FileUtils
 import top.qwq2333.util.Utils
@@ -59,15 +58,14 @@ fun main(args: Array<String>) {
         }
     }
 
-    Console.setTag("Config")
-    Console.printMsg("Program arguments: ${args.joinToString()}")
+    println("Program arguments: ${args.joinToString()}")
 
-    Console.printMsg("Validating Config")
+    println("Validating Config")
     val cfg = Yaml.default.decodeFromString(Config.serializer(), FileUtils.read("$source/config.yml"))
     Utils.validateConfig(cfg)
-    Console.printMsg("Config File is valid")
+    println("Config File is valid")
 
-    Console.printMsg("Generating base files.")
+    println("Generating base files.")
 
     Utils.prepareFile(tmp, cfg)
 
@@ -81,11 +79,11 @@ fun main(args: Array<String>) {
     val writer = XMLWriter(output, OutputFormat.createPrettyPrint())
     writer.write(content)
 
-    FileUtils.write("$tmp/${Defines.mainfolder}/content.opf", String(output.toByteArray()) )
+    FileUtils.write("$tmp/${Defines.mainFolder}/content.opf", String(output.toByteArray()))
 
 
     FileUtils.write(
-        "$tmp/${Defines.mainfolder}/Text/contents.xhtml",
+        "$tmp/${Defines.mainFolder}/Text/contents.xhtml",
         HTMLContent.genToC(HTMLContent.genToCElement(cfg.content))
     )
     if (cfg.metadata.cover.hasCover) {
@@ -93,7 +91,7 @@ fun main(args: Array<String>) {
     }
 
     FileUtils.pack(tmp, "$target/${cfg.metadata.title}.epub")
-    Console.printMsg("Complete")
+    println("Complete")
 
     exitProcess(0)
 

@@ -53,11 +53,11 @@ object HTMLContent {
     ) {
         for (content in contents) {
             var output: String = "null"
-            if (content.type == Defines.subcontent) {
+            if (content.type == Defines.subContent) {
                 process(metadata, content.content!!, targetPath, sourcePath, document)
             } else if (content.type == Defines.text) {
                 output = convertMdToHtml("$sourcePath/${content.path!!}", content.title!!, targetPath, document)
-                FileUtils.write("$targetPath/${Defines.mainfolder}/Text/${content.id}.xhtml", output)
+                FileUtils.write("$targetPath/${Defines.mainFolder}/Text/${content.id}.xhtml", output)
             } else if (content.type == Defines.image) {
                 val fileExtension = content.path!!.split(File.pathSeparator).last().split(".").last()
                 output = FileUtils.convertInputStreamToString(
@@ -71,10 +71,10 @@ object HTMLContent {
                     )
 
                 FileUtils.write(
-                    "$targetPath/${Defines.mainfolder}/Images/${content.id}.$fileExtension",
+                    "$targetPath/${Defines.mainFolder}/Images/${content.id}.$fileExtension",
                     FileInputStream("$sourcePath/${content.path!!}")
                 )
-                FileUtils.write("$targetPath/${Defines.mainfolder}/Text/${content.id}.xhtml", output)
+                FileUtils.write("$targetPath/${Defines.mainFolder}/Text/${content.id}.xhtml", output)
             }
         }
 
@@ -83,7 +83,7 @@ object HTMLContent {
     fun genCover(targetPath: String, sourcePath: String, metadata: top.qwq2333.config.data.Metadata) {
         val fileExtension = metadata.cover.image.split(File.pathSeparator).last().split(".").last()
         FileUtils.write(
-            "$targetPath/${Defines.mainfolder}/Images/cover.$fileExtension",
+            "$targetPath/${Defines.mainFolder}/Images/cover.$fileExtension",
             FileInputStream("${sourcePath}/${metadata.cover.image}")
         )
 
@@ -99,7 +99,7 @@ object HTMLContent {
             )
 
 
-        FileUtils.write("$targetPath/${Defines.mainfolder}/Text/cover.xhtml", output)
+        FileUtils.write("$targetPath/${Defines.mainFolder}/Text/cover.xhtml", output)
     }
 
     fun genToC(string: String) =
@@ -111,10 +111,10 @@ object HTMLContent {
             if (content.hiddenInContent) {
                 continue
             }
-            if (content.type == Defines.subcontent) {
+            if (content.type == Defines.subContent) {
                 sb.append(genToCElement(content.content!!))
             }
-            if (content.type != Defines.subcontent) {
+            if (content.type != Defines.subContent) {
                 sb.append(Defines.contentElement("${content.id}.xhtml", content.title!!))
             }
         }

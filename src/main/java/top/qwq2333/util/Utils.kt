@@ -24,11 +24,13 @@ package top.qwq2333.util
 
 import top.qwq2333.config.data.Config
 import top.qwq2333.generate.XMLContent
-import java.util.Locale
+import java.util.*
 
 object Utils {
     @JvmStatic
     fun validateConfig(config: Config) {
+        if (config.version < Defines.currentConfigVersion)
+            throw IllegalStateException("Config version is too new!\nPlease check updates")
         val id: MutableList<String> = mutableListOf()
         for (content in config.content) {
             if (!id.contains(content.id)) {
@@ -45,7 +47,7 @@ object Utils {
             } else if (type == Defines.image) {
                 if (content.path == null)
                     throw IllegalStateException("Path for type text should not be empty")
-            } else if (type == Defines.subcontent) {
+            } else if (type == Defines.subContent) {
                 if (content.content == null)
                     throw IllegalStateException("Content for type subcontent should not be empty")
             } else {
@@ -66,7 +68,7 @@ object Utils {
 
         // main folders
         FileUtils.createFolder("$path/${Defines.manifest}")
-        FileUtils.createFolder("$path/${Defines.mainfolder}")
+        FileUtils.createFolder("$path/${Defines.mainFolder}")
 
         // mimetype
         classloader.getResource("mimetype")?.readText(Charsets.UTF_8)?.let {
@@ -79,7 +81,7 @@ object Utils {
         }
 
         // fonts
-        val fontPath = "$path/${Defines.mainfolder}/Fonts"
+        val fontPath = "$path/${Defines.mainFolder}/Fonts"
         FileUtils.createFolder(fontPath)
         classloader.getResource("Fonts/author.ttf")!!.openStream().let {
             if (it != null) {
@@ -97,7 +99,7 @@ object Utils {
             }
         }
 
-        val stylesPath = "$path/${Defines.mainfolder}/${Defines.style}"
+        val stylesPath = "$path/${Defines.mainFolder}/${Defines.style}"
         FileUtils.createFolder(stylesPath)
         classloader.getResource("Styles/style.css")!!.openStream().let {
             if (it != null) {
@@ -106,10 +108,10 @@ object Utils {
         }
 
 
-        FileUtils.write("$path/${Defines.mainfolder}/toc.ncx", XMLContent.genTableOfContent(cfg))
+        FileUtils.write("$path/${Defines.mainFolder}/toc.ncx", XMLContent.genTableOfContent(cfg))
 
-        FileUtils.createFolder("$path/${Defines.mainfolder}/${Defines.textFolder}")
-        FileUtils.createFolder("$path/${Defines.mainfolder}/${Defines.imageFolder}")
+        FileUtils.createFolder("$path/${Defines.mainFolder}/${Defines.textFolder}")
+        FileUtils.createFolder("$path/${Defines.mainFolder}/${Defines.imageFolder}")
 
 
     }

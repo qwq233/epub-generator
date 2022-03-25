@@ -25,12 +25,13 @@ package top.qwq2333.util
 object Defines {
     const val text = "text"
     const val image = "image"
-    const val subcontent = "subcontent"
-    const val mainfolder = "OEBPS"
+    const val subContent = "subcontent"
+    const val mainFolder = "OEBPS"
     const val manifest = "META-INF"
     const val style = "Styles"
     const val textFolder = "Text"
     const val imageFolder = "Images"
+    const val currentConfigVersion = 1
 
     fun contentFull(element: String) =
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +

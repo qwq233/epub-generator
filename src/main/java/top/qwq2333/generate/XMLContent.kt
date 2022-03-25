@@ -34,7 +34,7 @@ import top.qwq2333.config.data.Content
 import top.qwq2333.util.Defines
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
-import java.util.UUID
+import java.util.*
 
 object XMLContent {
     private var depth = 1
@@ -102,12 +102,10 @@ object XMLContent {
             .addAttribute("id", "ncx")
             .addAttribute("media-type", "application/x-dtbncx+xml")
             .addAttribute("href", "toc.ncx")
-        /*
         manifest.addElement("item")
             .addAttribute("id", "mimetype")
             .addAttribute("href", "../mimetype")
             .addAttribute("media-type", "application/octet-stream")
-         */
         manifest.addElement("item")
             .addAttribute("id", "css")
             .addAttribute("href", "Styles/style.css")
@@ -225,7 +223,7 @@ object XMLContent {
      */
     private fun checkDepth(contents: List<Content>) {
         contents.forEach {
-            if (it.type == Defines.subcontent) {
+            if (it.type == Defines.subContent) {
                 currentDepth++
                 if (currentDepth > depth)
                     depth = currentDepth
@@ -244,7 +242,7 @@ object XMLContent {
             val target = parentElement.addElement("navPoint")
                 .addAttribute("id", "navPoint_${order}")
                 .addAttribute("playOrder", "${order++}")
-            if (content.type == Defines.subcontent) {
+            if (content.type == Defines.subContent) {
                 target.addElement("navLabel").addElement("text").text = content.title!!
                 target.addElement("content").addAttribute("src", "Text/${content.content!![0].id}.xhtml")
                 genNavPoint(content.content, target)
@@ -257,7 +255,7 @@ object XMLContent {
 
     fun genManifestElement(manifest: Element, contents: List<Content>, itemList: MutableList<String>) {
         contents.forEach {
-            if (it.type != Defines.subcontent) {
+            if (it.type != Defines.subContent) {
                 val item = manifest.addElement("item")
                 item.addAttribute("id", it.id)
                 if (it.type == Defines.text) {
