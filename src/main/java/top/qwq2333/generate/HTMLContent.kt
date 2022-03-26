@@ -36,6 +36,7 @@ import org.dom4j.io.SAXReader
 import org.dom4j.io.XMLWriter
 import org.dom4j.tree.DefaultDocumentType
 import org.jetbrains.kotlin.konan.file.File
+import top.qwq2333.config.data.Config
 import top.qwq2333.config.data.Content
 import top.qwq2333.util.Defines
 import top.qwq2333.util.FileUtils
@@ -49,36 +50,37 @@ import java.io.IOException
 object HTMLContent {
 
     fun process(
-        metadata: top.qwq2333.config.data.Metadata,
+        cfg: Config,
         contents: List<Content>,
         targetPath: String,
         sourcePath: String,
         document: Document
     ) {
+        val metadata = cfg.metadata
         for (content in contents) {
-            var output: String = "null"
-            if (content.type == Defines.subContent) {
-                process(metadata, content.content!!, targetPath, sourcePath, document)
-            } else if (content.type == Defines.text) {
-                output = convertMdToHtml("$sourcePath/${content.path!!}", content.title!!, targetPath, document)
-                FileUtils.write("$targetPath/${Defines.mainFolder}/Text/${content.id}.xhtml", output)
-            } else if (content.type == Defines.image) {
-                val fileExtension = content.path!!.split(File.pathSeparator).last().split(".").last()
-                output = FileUtils.convertInputStreamToString(
-                    this::class.java.classLoader.getResource("Text/image.xhtml")!!.openStream()
-                )
-                    .replace("LANGUAGE", metadata.language)
-                    .replace("TITLE", content.title!!)
-                    .replace(
-                        "PATH",
-                        "${content.id}.${fileExtension}"
+            var output: String
+            when (content.type) {
+                Defines.subContent ->
+                    process(cfg, content.content!!, targetPath, sourcePath, document)
+                Defines.image -> {
+                    val fileExtension = content.path!!.split(File.pathSeparator).last().split(".").last()
+                    output = FileUtils.convertInputStreamToString(
+                        this::class.java.classLoader.getResource("Text/image.xhtml")!!.openStream()
+                    ).replace("LANGUAGE", metadata.language).replace("TITLE", content.title!!).replace(
+                        "PATH", "${content.id}.${fileExtension}"
                     )
 
-                FileUtils.write(
-                    "$targetPath/${Defines.mainFolder}/Images/${content.id}.$fileExtension",
-                    FileInputStream("$sourcePath/${content.path!!}")
-                )
-                FileUtils.write("$targetPath/${Defines.mainFolder}/Text/${content.id}.xhtml", output)
+                    FileUtils.write(
+                        "$targetPath/${Defines.mainFolder}/Images/${content.id}.$fileExtension",
+                        FileInputStream("$sourcePath/${content.path}")
+                    )
+                    FileUtils.write("$targetPath/${Defines.mainFolder}/Text/${content.id}.xhtml", output)
+                }
+                Defines.text -> {
+                    output =
+                        convertMdToHtml("$sourcePath/${content.path!!}", content.title!!, targetPath, document, cfg)
+                    FileUtils.write("$targetPath/${Defines.mainFolder}/Text/${content.id}.xhtml", output)
+                }
             }
         }
 
@@ -94,20 +96,15 @@ object HTMLContent {
 
         val output = FileUtils.convertInputStreamToString(
             this::class.java.classLoader.getResource("Text/image.xhtml")!!.openStream()
+        ).replace("LANGUAGE", metadata.language).replace("TITLE", "Cover").replace(
+            "PATH", "cover.${fileExtension}"
         )
-            .replace("LANGUAGE", metadata.language)
-            .replace("TITLE", "Cover")
-            .replace(
-                "PATH",
-                "cover.${fileExtension}"
-            )
 
 
         FileUtils.write("$targetPath/${Defines.mainFolder}/Text/cover.xhtml", output)
     }
 
-    fun genToC(string: String) =
-        Defines.contentFull(string)
+    fun genToC(string: String) = Defines.contentFull(string)
 
     fun genToCElement(list: List<Content>): String {
         val sb = StringBuilder()
@@ -125,7 +122,9 @@ object HTMLContent {
         return sb.toString()
     }
 
-    private fun convertMdToHtml(path: String, title: String, targetPath: String, document: Document): String {
+    private fun convertMdToHtml(
+        path: String, title: String, targetPath: String, document: Document, cfg: Config
+    ): String {
         val content = FileUtils.read(path)
 
 
@@ -136,14 +135,11 @@ object HTMLContent {
             }
         }
 
-        val options: DataHolder = MutableDataSet().setFrom(ParserEmulationProfile.MULTI_MARKDOWN)
-            .set(
-                Parser.EXTENSIONS,
-                listOf(
-                    FootnoteExtension.create(),
-                    TablesExtension.create()
-                )
-            ).toImmutable()
+        val options: DataHolder = MutableDataSet().setFrom(ParserEmulationProfile.MULTI_MARKDOWN).set(
+            Parser.EXTENSIONS, listOf(
+                FootnoteExtension.create(), TablesExtension.create()
+            )
+        ).toImmutable()
 
         val parser = Parser.builder(options).build()
         val renderer = HtmlRenderer.builder(options).build()
@@ -157,10 +153,8 @@ object HTMLContent {
         val reader = SAXReader()
         val html: Document = reader.read(ByteArrayInputStream(target.toByteArray()))
         val type = DefaultDocumentType(
-            html.rootElement.name,
-            "-//W3C//DTD XHTML 1.1//EN",
-            "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"
-        );
+            html.rootElement.name, "-//W3C//DTD XHTML 1.1//EN", "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"
+        )
         html.docType = type
         html.rootElement.addNamespace("epub", "http://www.idpf.org/2007/ops")
         html.rootElement.addNamespace("xml", "http://www.w3.org/XML/1998/namespace")
@@ -177,14 +171,11 @@ object HTMLContent {
                     }
                     val fileName = sourceFile.path.split(File.separator).last()
                     FileUtils.write(
-                        "$targetPath/OEBPS/Images/$fileName",
-                        FileInputStream(sourceFile.path)
+                        "$targetPath/OEBPS/Images/$fileName", FileInputStream(sourceFile.path)
                     )
-                    element.attribute("src").value =
-                        "../Images/${sourceFile.path.split(File.separator).last()}"
+                    element.attribute("src").value = "../Images/${sourceFile.path.split(File.separator).last()}"
 
-                    val item = document.rootElement.element("manifest")
-                        .addElement("item")
+                    val item = document.rootElement.element("manifest").addElement("item")
                     item.addAttribute("id", "image-${fileName.split(".")[0]}")
                     item.addAttribute("href", "Images/${sourceFile.path.split(File.separator).last()}")
 
@@ -201,7 +192,20 @@ object HTMLContent {
         val writer = XMLWriter(result, OutputFormat.createPrettyPrint())
         writer.write(html)
 
-        return String(result.toByteArray())
+        target = String(result.toByteArray())
+
+        if (cfg.metadata.customDeliverLine.enable) {
+            if (cfg.metadata.customDeliverLine.type == Defines.image) {
+                target = target.replace(
+                    "<hr/>",
+                    Defines.deliverLineImage(Utils.fileExtension(cfg.metadata.customDeliverLine.content))
+                )
+            } else {
+                target = target.replace("<hr/>", Defines.textHTML(cfg.metadata.customDeliverLine.content))
+            }
+        }
+
+        return target
     }
 }
 

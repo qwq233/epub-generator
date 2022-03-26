@@ -32,6 +32,7 @@ import org.jetbrains.kotlin.konan.file.File
 import top.qwq2333.config.data.Config
 import top.qwq2333.config.data.Content
 import top.qwq2333.util.Defines
+import top.qwq2333.util.Utils
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
@@ -115,7 +116,7 @@ object XMLContent {
         val itemList: MutableList<String> = mutableListOf()
 
         if (cfg.metadata.cover.hasCover) {
-            val extension = cfg.metadata.cover.image.split(File.pathSeparator).last().split(".").last()
+            val extension = Utils.fileExtension(cfg.metadata.cover.image)
 
             val item = manifest.addElement("item")
             item.addAttribute("id", "cover")

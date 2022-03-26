@@ -22,8 +22,10 @@
 
 package top.qwq2333.util
 
+import org.jetbrains.kotlin.konan.file.File
 import top.qwq2333.config.data.Config
 import top.qwq2333.generate.XMLContent
+import java.io.IOException
 import java.util.*
 
 object Utils {
@@ -32,6 +34,17 @@ object Utils {
         if (config.version < Defines.currentConfigVersion)
             throw IllegalStateException("Config version is too new!\nPlease check updates")
         val id: MutableList<String> = mutableListOf()
+
+        val deliverLine = config.metadata.customDeliverLine
+        if (deliverLine.enable) {
+            if (deliverLine.type == Defines.image) {
+                if (!FileUtils.isExist(deliverLine.content))
+                    throw IOException("deliver image is not found!")
+            } else if (deliverLine.type != Defines.text) {
+                throw IllegalStateException("Type of deliver line can be only image or text!")
+            }
+        }
+
         for (content in config.content) {
             if (!id.contains(content.id)) {
                 id.add(content.id)
@@ -113,6 +126,17 @@ object Utils {
         FileUtils.createFolder("$path/${Defines.mainFolder}/${Defines.textFolder}")
         FileUtils.createFolder("$path/${Defines.mainFolder}/${Defines.imageFolder}")
 
+        val deliverLine = cfg.metadata.customDeliverLine
+        if (deliverLine.enable) {
+            if (deliverLine.type == Defines.image) {
+                File(deliverLine.content).copyTo(
+                    File(
+                        "$path/${Defines.mainFolder}/${Defines.imageFolder}/deliverLine.${fileExtension(deliverLine.content)}"
+                    )
+                )
+            }
+        }
+
 
     }
 
@@ -134,6 +158,9 @@ object Utils {
             + "(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?)$")
         return str.matches(Regex(regex))
     }
+
+    fun fileExtension(path: String) =
+        path.split("/").last().split(".").last()
 
 }
 

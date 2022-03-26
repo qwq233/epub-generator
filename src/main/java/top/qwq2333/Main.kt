@@ -78,7 +78,7 @@ fun main(args: Array<String>) {
         FileUtils.delete("$target/${cfg.metadata.title}.epub")
     }
     val content = XMLContent.genContent(cfg)
-    HTMLContent.process(cfg.metadata, cfg.content, tmp, source, content)
+    HTMLContent.process(cfg, cfg.content, tmp, source, content)
 
     val output = ByteArrayOutputStream()
     val writer = XMLWriter(output, OutputFormat.createPrettyPrint())

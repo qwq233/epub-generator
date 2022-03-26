@@ -24,7 +24,7 @@ package top.qwq2333.config.data
 
 import kotlinx.serialization.Serializable
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.*
 
 @Serializable
 data class Metadata(
@@ -34,13 +34,21 @@ data class Metadata(
     val description: String,
     val language: String,
     val date: String = SimpleDateFormat("yyyy-M-d").format(Date()),
-    val rights: String = "epub by $creator",
-    val cover: Cover
+    val rights: String = "epub by $creator using EPUB Generator created by James Clef",
+    val cover: Cover,
+    val customDeliverLine: CustomDeliverLine
 
 ) {
     @Serializable
     data class Cover(
         val hasCover: Boolean = false,
         val image: String = ""
+    )
+
+    @Serializable
+    data class CustomDeliverLine(
+        val enable: Boolean = false,
+        val type: String = "null",
+        val content: String = "null"
     )
 }

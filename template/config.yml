@@ -1,4 +1,4 @@
-version: 1 # Configuration File version
+version: 2 # Configuration File version
 
 metadata:
     title: Demo # The default is the previously set name
@@ -6,11 +6,15 @@ metadata:
     creator: James Clef # The default is the previously set author
     description: details
     language: zh # Language
-    date: 2022-2-27 # Default is generate time
+    # date: 2022-2-27 # Default is generate time
     rights: "epub by XXX" #
     cover:
         hasCover: true # boolean
         image: image/cover.jpg # path to image
+    customDeliverLine:
+        enable: true
+        type: text # text or image
+        content: I am deliver line # path if is image or text if is text
 
 content:
     -   id: copy-right
