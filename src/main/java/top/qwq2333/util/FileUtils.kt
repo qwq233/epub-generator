@@ -22,15 +22,7 @@
 
 package top.qwq2333.util
 
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
+import java.io.*
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -77,7 +69,7 @@ object FileUtils {
             throw IOException("Target is a folder.")
         }
         if (target.isFile) {
-            Console.printMsg("Target file $path is already exist.")
+            println("Target file $path is already exist.")
         }
         val fos = target.outputStream()
         fos.write(msg.toByteArray())
@@ -99,7 +91,7 @@ object FileUtils {
             throw IOException("Target is a folder.")
         }
         if (target.isFile) {
-            Console.printMsg("WARN: Target file $path is already exist.")
+            println("WARN: Target file $path is already exist.")
         }
         val fos = target.outputStream()
         fos.write(inputStream.readAllBytes())

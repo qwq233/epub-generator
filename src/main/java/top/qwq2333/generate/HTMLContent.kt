@@ -22,9 +22,13 @@
 
 package top.qwq2333.generate
 
+import com.vladsch.flexmark.ext.footnotes.FootnoteExtension
+import com.vladsch.flexmark.ext.tables.TablesExtension
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser
+import com.vladsch.flexmark.parser.ParserEmulationProfile
 import com.vladsch.flexmark.util.ast.Node
+import com.vladsch.flexmark.util.data.DataHolder
 import com.vladsch.flexmark.util.data.MutableDataSet
 import org.dom4j.Document
 import org.dom4j.io.OutputFormat
@@ -132,7 +136,15 @@ object HTMLContent {
             }
         }
 
-        val options = MutableDataSet()
+        val options: DataHolder = MutableDataSet().setFrom(ParserEmulationProfile.MULTI_MARKDOWN)
+            .set(
+                Parser.EXTENSIONS,
+                listOf(
+                    FootnoteExtension.create(),
+                    TablesExtension.create()
+                )
+            ).toImmutable()
+
         val parser = Parser.builder(options).build()
         val renderer = HtmlRenderer.builder(options).build()
 
@@ -174,7 +186,7 @@ object HTMLContent {
                     val item = document.rootElement.element("manifest")
                         .addElement("item")
                     item.addAttribute("id", "image-${fileName.split(".")[0]}")
-                    item.addAttribute("href","Images/${sourceFile.path.split(File.separator).last()}")
+                    item.addAttribute("href", "Images/${sourceFile.path.split(File.separator).last()}")
 
                     when (val extension = fileName.split(".")[1]) {
                         "jpg" -> item.addAttribute("media-type", "image/jpeg")

@@ -23,6 +23,7 @@
 package top.qwq2333
 
 import com.charleskorn.kaml.Yaml
+import com.charleskorn.kaml.YamlConfiguration
 import org.dom4j.io.OutputFormat
 import org.dom4j.io.XMLWriter
 import top.qwq2333.config.data.Config
@@ -61,7 +62,11 @@ fun main(args: Array<String>) {
     println("Program arguments: ${args.joinToString()}")
 
     println("Validating Config")
-    val cfg = Yaml.default.decodeFromString(Config.serializer(), FileUtils.read("$source/config.yml"))
+    val yamlConfiguration = YamlConfiguration(strictMode = false)
+    val cfg = Yaml(configuration = yamlConfiguration).decodeFromString(
+        Config.serializer(),
+        FileUtils.read("$source/config.yml")
+    )
     Utils.validateConfig(cfg)
     println("Config File is valid")
 

@@ -41,7 +41,7 @@ val kotlinVersion = "1.6.20-M1"
 dependencies {
     implementation("com.charleskorn.kaml:kaml:_")
     implementation("org.dom4j:dom4j:_")
-    implementation("com.vladsch.flexmark:flexmark:0.64.0")
+    implementation("com.vladsch.flexmark:flexmark-all:0.64.0")
     implementation(Kotlin.stdlib.common)
     implementation(Kotlin.stdlib)
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
