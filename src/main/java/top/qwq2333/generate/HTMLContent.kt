@@ -158,7 +158,7 @@ object HTMLContent {
         html.docType = type
         html.rootElement.addNamespace("epub", "http://www.idpf.org/2007/ops")
         html.rootElement.addNamespace("xml", "http://www.w3.org/XML/1998/namespace")
-        html.rootElement.element("body").element("div").elements().forEach {
+        html.rootElement.element("body").element("div").elements().forEach { it ->
             it.elements().forEach { element ->
                 if (element.name == "img") {
                     if (Utils.isURL(element.attribute("src").value)) {
@@ -183,6 +183,27 @@ object HTMLContent {
                         "jpg" -> item.addAttribute("media-type", "image/jpeg")
                         "png" -> item.addAttribute("media-type", "image/png")
                         else -> item.addAttribute("media-type", "image/$extension")
+                    }
+                }
+                if (element.name == "a") {
+                    val link = element.attribute("href").value
+                    if (!Utils.isURL(link)) {
+                        val fileName = link.split(File.separator).last()
+                        var isFound = false
+                        cfg.content.forEach { content ->
+                            if (content.type == Defines.text) {
+                                if (content.path!!.contains(fileName)) {
+                                    element.attribute("href").value = "./${content.id}.xhtml"
+                                    isFound = true
+                                }
+                            }
+                        }
+                        if (!isFound) {
+                            println(
+                                "WARN: file $fileName is not defined in config.yml or it's a url,\n" +
+                                    "so it will not link to any file."
+                            )
+                        }
                     }
                 }
             }
