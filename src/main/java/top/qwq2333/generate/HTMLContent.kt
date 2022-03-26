@@ -188,7 +188,7 @@ object HTMLContent {
                 if (element.name == "a") {
                     val link = element.attribute("href").value
                     if (!Utils.isURL(link)) {
-                        val fileName = link.split(File.separator).last()
+                        val fileName = link.split("/").last()
                         var isFound = false
                         cfg.content.forEach { content ->
                             if (content.type == Defines.text) {

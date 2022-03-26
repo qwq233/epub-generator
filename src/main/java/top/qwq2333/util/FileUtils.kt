@@ -146,7 +146,7 @@ object FileUtils {
             Files.walk(pp)
                 .filter { path -> !Files.isDirectory(path) }
                 .forEach { path ->
-                    val zipEntry = ZipEntry(pp.relativize(path).toString())
+                    val zipEntry = ZipEntry(pp.relativize(path).toString().replace("\\","/")) // ensure use "/" but not "\"
                     zs.putNextEntry(zipEntry)
                     Files.copy(path, zs)
                     zs.closeEntry()
