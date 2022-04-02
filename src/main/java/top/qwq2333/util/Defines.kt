@@ -42,10 +42,10 @@ object Defines {
             "</head><body><div> <p class=\"contents em12\">Table of Contents</p>$element</div></body></html>"
 
     fun contentElement(href: String, title: String): String =
-        "<p class=\"content\"><a class=\"no-d co20 bold\" href=\"$href\">$title</a></p>"
+        "<p> </p><p class=\"content\"><a class=\"no-d co20 bold\" href=\"$href\">$title</a></p><p> </p>"
 
     fun textHTML(str: String): String =
-        "<p>$str</p>"
+        "<p> </p><p>$str</p><p> </p>"
 
     fun deliverLineImage(extension: String) = "<p><img src=\"../deliverLine.${extension}\" alt=\"\"/></p> "
 }

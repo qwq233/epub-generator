@@ -158,7 +158,7 @@ object HTMLContent {
         html.docType = type
         html.rootElement.addNamespace("epub", "http://www.idpf.org/2007/ops")
         html.rootElement.addNamespace("xml", "http://www.w3.org/XML/1998/namespace")
-        html.rootElement.element("body").element("div").elements().forEach { it ->
+        html.rootElement.element("body").element("div").elements().forEach {
             it.elements().forEach { element ->
                 if (element.name == "img") {
                     if (Utils.isURL(element.attribute("src").value)) {
@@ -216,13 +216,13 @@ object HTMLContent {
         target = String(result.toByteArray())
 
         if (cfg.metadata.customDeliverLine.enable) {
-            if (cfg.metadata.customDeliverLine.type == Defines.image) {
-                target = target.replace(
+            target = if (cfg.metadata.customDeliverLine.type == Defines.image) {
+                target.replace(
                     "<hr/>",
                     Defines.deliverLineImage(Utils.fileExtension(cfg.metadata.customDeliverLine.content))
                 )
             } else {
-                target = target.replace("<hr/>", Defines.textHTML(cfg.metadata.customDeliverLine.content))
+                target.replace("<hr/>", Defines.textHTML(cfg.metadata.customDeliverLine.content))
             }
         }
 

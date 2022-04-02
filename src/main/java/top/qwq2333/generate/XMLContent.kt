@@ -135,6 +135,15 @@ object XMLContent {
             }
         }
 
+
+        if (cfg.metadata.customDeliverLine.enable && cfg.metadata.customDeliverLine.type == Defines.image) {
+            val extension = Utils.fileExtension(cfg.metadata.customDeliverLine.content)
+
+            val item = manifest.addElement("item")
+            item.addAttribute("id", "deliverLine")
+                .addAttribute("href", "Images/deliverLine.$extension")
+        }
+
         listOf("author.ttf", "KaiGenGothicTC-Heavy.ttf", "title.ttf").forEach {
             manifest.addElement("item")
                 .addAttribute("id", it)
@@ -254,7 +263,7 @@ object XMLContent {
         }
     }
 
-    fun genManifestElement(manifest: Element, contents: List<Content>, itemList: MutableList<String>) {
+    private fun genManifestElement(manifest: Element, contents: List<Content>, itemList: MutableList<String>) {
         contents.forEach {
             if (it.type != Defines.subContent) {
                 val item = manifest.addElement("item")
