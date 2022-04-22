@@ -6,3 +6,5 @@ app/.cxx
 *.iml
 local.properties
 output/
+book*/
+finished_project/

@@ -31,6 +31,7 @@ import com.vladsch.flexmark.util.ast.Node
 import com.vladsch.flexmark.util.data.DataHolder
 import com.vladsch.flexmark.util.data.MutableDataSet
 import org.dom4j.Document
+import org.dom4j.Element
 import org.dom4j.io.OutputFormat
 import org.dom4j.io.SAXReader
 import org.dom4j.io.XMLWriter
@@ -158,56 +159,8 @@ object HTMLContent {
         html.docType = type
         html.rootElement.addNamespace("epub", "http://www.idpf.org/2007/ops")
         html.rootElement.addNamespace("xml", "http://www.w3.org/XML/1998/namespace")
-        html.rootElement.element("body").element("div").elements().forEach {
-            it.elements().forEach { element ->
-                if (element.name == "img") {
-                    if (Utils.isURL(element.attribute("src").value)) {
-                        throw UnsupportedOperationException("It don't support the image from internet.")
-                    }
-                    val value = element.attribute("src").value
-                    val sourceFile = File("${File(path).parent}/${value}")
-                    if (!sourceFile.isFile) {
-                        throw IOException("Image not found. Please check markdown file.")
-                    }
-                    val fileName = sourceFile.path.split(File.separator).last()
-                    FileUtils.write(
-                        "$targetPath/OEBPS/Images/$fileName", FileInputStream(sourceFile.path)
-                    )
-                    element.attribute("src").value = "../Images/${sourceFile.path.split(File.separator).last()}"
 
-                    val item = document.rootElement.element("manifest").addElement("item")
-                    item.addAttribute("id", "image-${fileName.split(".")[0]}")
-                    item.addAttribute("href", "Images/${sourceFile.path.split(File.separator).last()}")
-
-                    when (val extension = fileName.split(".")[1]) {
-                        "jpg" -> item.addAttribute("media-type", "image/jpeg")
-                        "png" -> item.addAttribute("media-type", "image/png")
-                        else -> item.addAttribute("media-type", "image/$extension")
-                    }
-                }
-                if (element.name == "a") {
-                    val link = element.attribute("href").value
-                    if (!Utils.isURL(link)) {
-                        val fileName = link.split("/").last()
-                        var isFound = false
-                        cfg.content.forEach { content ->
-                            if (content.type == Defines.text) {
-                                if (content.path!!.contains(fileName)) {
-                                    element.attribute("href").value = "./${content.id}.xhtml"
-                                    isFound = true
-                                }
-                            }
-                        }
-                        if (!isFound) {
-                            println(
-                                "WARN: file $fileName is not defined in config.yml or it's a url,\n" +
-                                    "so it will not link to any file."
-                            )
-                        }
-                    }
-                }
-            }
-        }
+        processHTMLElements(cfg, html.rootElement.element("body").element("div").elements(), path, targetPath, document)
 
         val result = ByteArrayOutputStream()
         val writer = XMLWriter(result, OutputFormat.createPrettyPrint())
@@ -227,6 +180,73 @@ object HTMLContent {
         }
 
         return target
+    }
+
+    private fun processHTMLElements(
+        cfg: Config,
+        elements: List<Element>,
+        path: String,
+        targetPath: String,
+        document: Document
+    ): Unit {
+        elements.forEach { element ->
+            if (element.elements().isNotEmpty()) {
+                processHTMLElements(cfg, element.elements(), path, targetPath, document)
+
+            }
+            if (element.name == "img") {
+                if (Utils.isURL(element.attribute("src").value)) {
+                    throw UnsupportedOperationException("It don't support the image from internet.")
+                }
+                val value = element.attribute("src").value
+                val sourceFile = File("${File(path).parent}/${value}")
+                if (!sourceFile.isFile) {
+                    throw IOException("Image not found. Please check markdown file.")
+                }
+                val fileName = sourceFile.path.split(File.separator).last()
+                FileUtils.write(
+                    "$targetPath/OEBPS/Images/$fileName", FileInputStream(sourceFile.path)
+                )
+                element.attribute("src").value = "../Images/${sourceFile.path.split(File.separator).last()}"
+
+                val item = document.rootElement.element("manifest").addElement("item")
+                item.addAttribute("id", "image-${fileName.split(".")[0]}")
+                item.addAttribute("href", "Images/${sourceFile.path.split(File.separator).last()}")
+
+                when (val extension = fileName.split(".")[1]) {
+                    "jpg" -> item.addAttribute("media-type", "image/jpeg")
+                    "png" -> item.addAttribute("media-type", "image/png")
+                    else -> item.addAttribute("media-type", "image/$extension")
+                }
+            }
+            if (element.name == "a") {
+                val link = element.attribute("href").value
+                if (!Utils.isURL(link)) {
+                    val fileName = link.split("/").last()
+                    val isFound = processContentLink(cfg.content, element, fileName)
+                    if (!isFound) {
+                        println(
+                            "WARN: file $fileName is not defined in config.yml or it's a url,\n" +
+                                "so it will not link to any file."
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun processContentLink(contents: List<Content>, element: Element, fileName: String): Boolean {
+        contents.forEach {
+            if (it.type == Defines.text) {
+                if (it.path!!.contains(fileName)) {
+                    element.attribute("href").value = "./${it.id}.xhtml"
+                    return true
+                }
+            } else if (it.type == Defines.subContent)
+                if (processContentLink(it.content!!, element, fileName))
+                    return true
+        }
+        return false
     }
 }
 

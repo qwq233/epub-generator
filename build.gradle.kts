@@ -23,20 +23,20 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.20-M1"
+    kotlin("jvm") version "1.6.20"
     kotlin("plugin.serialization") version "1.6.20-M1"
     application
     java
 }
 
 group = "top.qwq2333"
-version = "1.0.7"
+version = "1.0.8"
 
 repositories {
     mavenCentral()
 }
 
-val kotlinVersion = "1.6.20-M1"
+val kotlinVersion = "1.6.20"
 
 dependencies {
     implementation("com.charleskorn.kaml:kaml:_")
@@ -61,7 +61,7 @@ tasks.withType<Jar> {
     manifest {
         attributes["Main-Class"] = "top.qwq2333.MainKt"
     }
-    // To add all of the dependencies otherwise a "NoClassDefFoundError" error
+    // To add all the dependencies otherwise a "NoClassDefFoundError" error
     from(sourceSets.main.get().output)
 
     dependsOn(configurations.runtimeClasspath)
