@@ -4,20 +4,18 @@
  * https://github.com/qwq233/epub-generator
  *
  * This software is non-free but opensource software: you can redistribute it
- * and/or modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation; either
- * version 3 of the License, or any later version and our eula as published
- * by qwq233.
+ * and/or modify it under the terms of our Licenses
+ * as published by James Clef; either
+ * version 2 of the License, or any later version.
  *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the our
+ * licenses for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
+ * You should have received a copy of the our License
  * and eula along with this software.  If not, see
- * <https://www.gnu.org/licenses/>
- * <https://github.com/qwq233/qwq233/blob/master/eula.md>.
+ * <https://github.com/qwq233/License/blob/master/v2/LICENSE.md>.
  */
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -30,7 +28,7 @@ plugins {
 }
 
 group = "top.qwq2333"
-version = "1.0.8"
+version = "1.0.9"
 
 repositories {
     mavenCentral()

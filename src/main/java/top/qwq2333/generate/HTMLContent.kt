@@ -6,12 +6,12 @@
  * This software is non-free but opensource software: you can redistribute it
  * and/or modify it under the terms of our Licenses
  * as published by James Clef; either
- * version 3 of the License, or any later version.
- * 
+ * version 2 of the License, or any later version.
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Affero General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the our
+ * licenses for more details.
  *
  * You should have received a copy of the our License
  * and eula along with this software.  If not, see
