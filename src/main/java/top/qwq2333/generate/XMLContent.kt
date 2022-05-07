@@ -1,21 +1,21 @@
 /*
- * EPUB Generator
- * Copyright (C) 2022 qwq233 qwq233@qwq2333.top
- * https://github.com/qwq233/epub-generator
+ *  EPUB Generator
+ *  Copyright (C) 2022 qwq233 qwq233@qwq2333.top
+ *  https://github.com/qwq233/epub-generator
+ *  *
+ *  This software is non-free but opensource software: you can redistribute it
+ *  and/or modify it under the terms of our Licenses
+ *  as published by James Clef; either
+ *  version 2 of the License, or any later version.
  *
- * This software is non-free but opensource software: you can redistribute it
- * and/or modify it under the terms of our Licenses
- * as published by James Clef; either
- * version 2 of the License, or any later version.
+ *  This software is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See our
+ *  license
  *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the our
- * licenses for more details.
- *
- * You should have received a copy of the our License
- * and eula along with this software.  If not, see
- * <https://github.com/qwq233/License/blob/master/v2/LICENSE.md>.
+ *  You should have received a copy of the our License
+ *  and eula along with this software.  If not, see
+ *  <https://github.com/qwq233/License/blob/master/v2/LICENSE.md>.
  */
 
 package top.qwq2333.generate
@@ -27,13 +27,16 @@ import org.dom4j.io.OutputFormat
 import org.dom4j.io.XMLWriter
 import org.dom4j.tree.DefaultDocumentType
 import org.jetbrains.kotlin.konan.file.File
+import top.qwq2333.config.Pool.cfg
+import top.qwq2333.config.Pool.globalContents
+import top.qwq2333.config.Pool.metadata
 import top.qwq2333.config.data.Config
 import top.qwq2333.config.data.Content
 import top.qwq2333.util.Defines
 import top.qwq2333.util.Utils
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.UUID
 
 object XMLContent {
     private var depth = 0
@@ -43,52 +46,52 @@ object XMLContent {
 
     /**
      * Generate content.opf
-     * @param cfg config
      * @return xml content to write to file
      */
-    fun genContent(cfg: Config): Document {
+    fun genContent(): Document {
         val target = DocumentHelper.createDocument()
         val rootElement = target.addElement("package", "http://www.idpf.org/2007/opf")
         rootElement.addAttribute("version", "2.0")
             .addAttribute("unique-identifier", "BookId")
 
-        val metadata = rootElement.addElement("metadata")
+        val xmlMetadata = rootElement.addElement("metadata")
             .addNamespace("opf", "http://www.idpf.org/2007/opf")
             .addNamespace("dc", "http://purl.org/dc/elements/1.1/")
-        metadata.addElement("dc:title").text = cfg.metadata.title
-        metadata.addElement("dc:creator")
+        xmlMetadata.addElement("dc:title").text = metadata.title
+        xmlMetadata.addElement("dc:creator")
             .addAttribute("opf:role", "aut")
-            .addAttribute("opf:file-as", cfg.metadata.author)
-            .text = cfg.metadata.author
-        metadata.addElement("dc:date")
+            .addAttribute("opf:file-as", metadata.author)
+            .text = metadata.author
+        xmlMetadata.addElement("dc:date")
             .text =
             SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'+08:00'").format(
-                SimpleDateFormat("yyyy-M-d").parse(cfg.metadata.date)
+                SimpleDateFormat("yyyy-M-d").parse(metadata.date)
             )
-        metadata.addElement("dc:rights").text = cfg.metadata.rights
-        metadata.addElement("dc:identifier")
+        xmlMetadata.addElement("dc:rights").text = metadata.rights
+        xmlMetadata.addElement("dc:identifier")
             .addAttribute("id", "BookId")
             .addAttribute("opf:scheme", "UUID")
             .text = "urn:uuid:${uuid}"
-        metadata.addElement("dc:identifier")
+        xmlMetadata.addElement("dc:identifier")
             .addAttribute("opf:scheme", "calibre")
             .text = "$uuid"
-        metadata.addElement("language")
-            .text = cfg.metadata.language
-        metadata.addElement("meta")
+        xmlMetadata.addElement("language")
+            .text = metadata.language
+        xmlMetadata.addElement("meta")
             .addAttribute("name", "Sigil version")
             .addAttribute("content", "1.7.0")
-        metadata.addElement("meta")
+        xmlMetadata.addElement("meta")
             .addAttribute("name", "calibre:title_sort")
-            .addAttribute("content", cfg.metadata.title)
-        val contributor = metadata.addElement("dc:contributor")
+            .addAttribute("content", metadata.title)
+        val contributor = xmlMetadata.addElement("dc:contributor")
         contributor.addAttribute("opf:role", "bkp")
-        contributor.text = "EPUB Generator [https://github.com/qwq233/epub-generator] by James Clef [https://qwq2333.top/]"
-        metadata.addElement("meta")
+        contributor.text =
+            "EPUB Generator [https://github.com/qwq233/epub-generator] by James Clef [https://qwq2333.top/]"
+        xmlMetadata.addElement("meta")
             .addAttribute("name", "calibre:author_link_map")
-            .addAttribute("content", "{&quot;${cfg.metadata.author}&quot;: &quot;&quot;}")
-        if (cfg.metadata.cover.hasCover) {
-            metadata.addElement("meta")
+            .addAttribute("content", "{&quot;${metadata.author}&quot;: &quot;&quot;}")
+        if (metadata.cover.hasCover) {
+            xmlMetadata.addElement("meta")
                 .addAttribute("name", "cover")
                 .addAttribute(
                     "content",
@@ -113,8 +116,8 @@ object XMLContent {
 
         val itemList: MutableList<String> = mutableListOf()
 
-        if (cfg.metadata.cover.hasCover) {
-            val extension = Utils.fileExtension(cfg.metadata.cover.image)
+        if (metadata.cover.hasCover) {
+            val extension = Utils.fileExtension(metadata.cover.image)
 
             val item = manifest.addElement("item")
             item.addAttribute("id", "cover")
@@ -134,8 +137,8 @@ object XMLContent {
         }
 
 
-        if (cfg.metadata.customDeliverLine.enable && cfg.metadata.customDeliverLine.type == Defines.image) {
-            val extension = Utils.fileExtension(cfg.metadata.customDeliverLine.content)
+        if (metadata.customDeliverLine.enable && metadata.customDeliverLine.type == Defines.image) {
+            val extension = Utils.fileExtension(metadata.customDeliverLine.content)
 
             val item = manifest.addElement("item")
             item.addAttribute("id", "deliverLine")
@@ -153,7 +156,7 @@ object XMLContent {
             .addAttribute("href", "Text/contents.xhtml")
             .addAttribute("media-type", "application/xhtml+xml")
 
-        genManifestElement(manifest, cfg.content, itemList)
+        genManifestElement(manifest, globalContents, itemList)
 
         val spine = rootElement.addElement("spine").addAttribute("toc", "ncx")
         itemList.forEach {
@@ -168,7 +171,7 @@ object XMLContent {
             .addAttribute("type", "toc")
             .addAttribute("title", "Table of Contents")
             .addAttribute("href", "Text/contents.xhtml")
-        if (cfg.metadata.cover.hasCover) {
+        if (metadata.cover.hasCover) {
             guide.addElement("reference")
                 .addAttribute("type", "cover")
                 .addAttribute("title", "Cover")
@@ -180,10 +183,9 @@ object XMLContent {
 
     /**
      * Generate toc.ncx
-     * @param cfg config
      * @return xml content to write to file
      */
-    fun genTableOfContent(cfg: Config): String {
+    fun genTableOfContent(): String {
         val target = DocumentHelper.createDocument()
         val rootElement = target.addElement("ncx", "http://www.daisy.org/z3986/2005/ncx/")
         target.docType = DefaultDocumentType(
@@ -193,7 +195,7 @@ object XMLContent {
         )
 
         rootElement.addAttribute("version", "2005-1")
-        rootElement.addAttribute("xml:lang", cfg.metadata.language)
+        rootElement.addAttribute("xml:lang", metadata.language)
 
         val metadata = rootElement.addElement("head")
         checkDepth(cfg.content)

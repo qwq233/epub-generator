@@ -1,21 +1,21 @@
 /*
- * EPUB Generator
- * Copyright (C) 2022 qwq233 qwq233@qwq2333.top
- * https://github.com/qwq233/epub-generator
+ *  EPUB Generator
+ *  Copyright (C) 2022 qwq233 qwq233@qwq2333.top
+ *  https://github.com/qwq233/epub-generator
+ *  *
+ *  This software is non-free but opensource software: you can redistribute it
+ *  and/or modify it under the terms of our Licenses
+ *  as published by James Clef; either
+ *  version 2 of the License, or any later version.
  *
- * This software is non-free but opensource software: you can redistribute it
- * and/or modify it under the terms of our Licenses
- * as published by James Clef; either
- * version 2 of the License, or any later version.
+ *  This software is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See our
+ *  license
  *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the our
- * licenses for more details.
- *
- * You should have received a copy of the our License
- * and eula along with this software.  If not, see
- * <https://github.com/qwq233/License/blob/master/v2/LICENSE.md>.
+ *  You should have received a copy of the our License
+ *  and eula along with this software.  If not, see
+ *  <https://github.com/qwq233/License/blob/master/v2/LICENSE.md>.
  */
 
 package top.qwq2333
@@ -24,6 +24,9 @@ import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
 import org.dom4j.io.OutputFormat
 import org.dom4j.io.XMLWriter
+import top.qwq2333.config.Pool.cfg
+import top.qwq2333.config.Pool.globalContents
+import top.qwq2333.config.Pool.metadata
 import top.qwq2333.config.data.Config
 import top.qwq2333.generate.HTMLContent
 import top.qwq2333.generate.XMLContent
@@ -61,10 +64,14 @@ fun main(args: Array<String>) {
 
     println("Validating Config")
     val yamlConfiguration = YamlConfiguration(strictMode = false)
-    val cfg = Yaml(configuration = yamlConfiguration).decodeFromString(
+    cfg = Yaml(configuration = yamlConfiguration).decodeFromString(
         Config.serializer(),
         FileUtils.read("$source/config.yml")
     )
+
+    metadata = cfg.metadata
+    globalContents = cfg.content
+
     Utils.validateConfig(cfg)
     println("Config File is valid")
 
@@ -75,8 +82,8 @@ fun main(args: Array<String>) {
     if (FileUtils.isExist("$target/${cfg.metadata.title}.epub")) {
         FileUtils.delete("$target/${cfg.metadata.title}.epub")
     }
-    val content = XMLContent.genContent(cfg)
-    HTMLContent.process(cfg, cfg.content, tmp, source, content)
+    val content = XMLContent.genContent()
+    HTMLContent.process(globalContents, tmp, source, content)
 
     val output = ByteArrayOutputStream()
     val writer = XMLWriter(output, OutputFormat.createPrettyPrint())
@@ -90,10 +97,10 @@ fun main(args: Array<String>) {
         HTMLContent.genToC(HTMLContent.genToCElement(cfg.content))
     )
     if (cfg.metadata.cover.hasCover) {
-        HTMLContent.genCover(tmp, source, cfg.metadata)
+        HTMLContent.genCover(tmp, source)
     }
 
-    FileUtils.pack(tmp, "$target/${cfg.metadata.title}.epub")
+    FileUtils.pack(tmp, "$target/${metadata.title}.epub")
     println("Complete")
 
     exitProcess(0)

@@ -1,21 +1,21 @@
 /*
- * EPUB Generator
- * Copyright (C) 2022 qwq233 qwq233@qwq2333.top
- * https://github.com/qwq233/epub-generator
+ *  EPUB Generator
+ *  Copyright (C) 2022 qwq233 qwq233@qwq2333.top
+ *  https://github.com/qwq233/epub-generator
+ *  *
+ *  This software is non-free but opensource software: you can redistribute it
+ *  and/or modify it under the terms of our Licenses
+ *  as published by James Clef; either
+ *  version 2 of the License, or any later version.
  *
- * This software is non-free but opensource software: you can redistribute it
- * and/or modify it under the terms of our Licenses
- * as published by James Clef; either
- * version 2 of the License, or any later version.
+ *  This software is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See our
+ *  license
  *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the our
- * licenses for more details.
- *
- * You should have received a copy of the our License
- * and eula along with this software.  If not, see
- * <https://github.com/qwq233/License/blob/master/v2/LICENSE.md>.
+ *  You should have received a copy of the our License
+ *  and eula along with this software.  If not, see
+ *  <https://github.com/qwq233/License/blob/master/v2/LICENSE.md>.
  */
 
 package top.qwq2333.generate
@@ -35,6 +35,8 @@ import org.dom4j.io.SAXReader
 import org.dom4j.io.XMLWriter
 import org.dom4j.tree.DefaultDocumentType
 import org.jetbrains.kotlin.konan.file.File
+import top.qwq2333.config.Pool.cfg
+import top.qwq2333.config.Pool.metadata
 import top.qwq2333.config.data.Config
 import top.qwq2333.config.data.Content
 import top.qwq2333.util.Defines
@@ -49,18 +51,16 @@ import java.io.IOException
 object HTMLContent {
 
     fun process(
-        cfg: Config,
         contents: List<Content>,
         targetPath: String,
         sourcePath: String,
         document: Document
     ) {
-        val metadata = cfg.metadata
         for (content in contents) {
             var output: String
             when (content.type) {
                 Defines.subContent ->
-                    process(cfg, content.content!!, targetPath, sourcePath, document)
+                    process(content.content!!, targetPath, sourcePath, document)
                 Defines.image -> {
                     val fileExtension = content.path!!.split(File.pathSeparator).last().split(".").last()
                     output = FileUtils.convertInputStreamToString(
@@ -85,7 +85,7 @@ object HTMLContent {
 
     }
 
-    fun genCover(targetPath: String, sourcePath: String, metadata: top.qwq2333.config.data.Metadata) {
+    fun genCover(targetPath: String, sourcePath: String) {
         val fileExtension = metadata.cover.image.split(File.pathSeparator).last().split(".").last()
         FileUtils.write(
             "$targetPath/${Defines.mainFolder}/Images/cover.$fileExtension",
@@ -158,7 +158,7 @@ object HTMLContent {
         html.rootElement.addNamespace("epub", "http://www.idpf.org/2007/ops")
         html.rootElement.addNamespace("xml", "http://www.w3.org/XML/1998/namespace")
 
-        processHTMLElements(cfg, html.rootElement.element("body").element("div").elements(), path, targetPath, document)
+        processHTMLElements(html.rootElement.element("body").element("div").elements(), path, targetPath, document)
 
         val result = ByteArrayOutputStream()
         val writer = XMLWriter(result, OutputFormat.createPrettyPrint())
@@ -181,7 +181,6 @@ object HTMLContent {
     }
 
     private fun processHTMLElements(
-        cfg: Config,
         elements: List<Element>,
         path: String,
         targetPath: String,
@@ -189,7 +188,7 @@ object HTMLContent {
     ): Unit {
         elements.forEach { element ->
             if (element.elements().isNotEmpty()) {
-                processHTMLElements(cfg, element.elements(), path, targetPath, document)
+                processHTMLElements(element.elements(), path, targetPath, document)
 
             }
             if (element.name == "img") {
