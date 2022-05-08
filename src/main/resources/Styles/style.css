@@ -407,3 +407,8 @@ p {
 .footnotes ol li a {
     display: inline-block;
 }
+
+ul li p {
+    text-indent: unset;
+    display: inline-block;
+}
