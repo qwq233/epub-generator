@@ -21,6 +21,7 @@
 package top.qwq2333.util
 
 import org.jetbrains.kotlin.konan.file.File
+import top.qwq2333.config.Pool.cfg
 import top.qwq2333.config.data.Config
 import top.qwq2333.generate.XMLContent
 import java.io.IOException
@@ -28,12 +29,12 @@ import java.util.*
 
 object Utils {
     @JvmStatic
-    fun validateConfig(config: Config) {
-        if (config.version < Defines.currentConfigVersion)
+    fun validateConfig() {
+        if (cfg.version < Defines.currentConfigVersion)
             throw IllegalStateException("Config version is too new!\nPlease check updates")
         val id: MutableList<String> = mutableListOf()
 
-        val deliverLine = config.metadata.customDeliverLine
+        val deliverLine = cfg.metadata.customDeliverLine
         if (deliverLine.enable) {
             if (deliverLine.type == Defines.image) {
                 if (!FileUtils.isExist(deliverLine.content))
@@ -43,7 +44,7 @@ object Utils {
             }
         }
 
-        for (content in config.content) {
+        for (content in cfg.content) {
             if (!id.contains(content.id)) {
                 id.add(content.id)
             } else {
@@ -74,7 +75,7 @@ object Utils {
      * @param path tmp path
      */
     @JvmStatic
-    fun prepareFile(path: String, cfg: Config) {
+    fun prepareFile(path: String) {
         val classloader = this::class.java.classLoader
 
         // main folders
@@ -119,7 +120,7 @@ object Utils {
         }
 
 
-        FileUtils.write("$path/${Defines.mainFolder}/toc.ncx", XMLContent.genTableOfContent(cfg))
+        FileUtils.write("$path/${Defines.mainFolder}/toc.ncx", XMLContent.genTableOfContent())
 
         FileUtils.createFolder("$path/${Defines.mainFolder}/${Defines.textFolder}")
         FileUtils.createFolder("$path/${Defines.mainFolder}/${Defines.imageFolder}")

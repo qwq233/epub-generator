@@ -72,12 +72,12 @@ fun main(args: Array<String>) {
     metadata = cfg.metadata
     globalContents = cfg.content
 
-    Utils.validateConfig(cfg)
+    Utils.validateConfig()
     println("Config File is valid")
 
     println("Generating base files.")
 
-    Utils.prepareFile(tmp, cfg)
+    Utils.prepareFile(tmp)
 
     if (FileUtils.isExist("$target/${cfg.metadata.title}.epub")) {
         FileUtils.delete("$target/${cfg.metadata.title}.epub")
