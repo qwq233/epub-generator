@@ -75,7 +75,7 @@ object XMLContent {
         xmlMetadata.addElement("dc:identifier")
             .addAttribute("opf:scheme", "calibre")
             .text = "$uuid"
-        xmlMetadata.addElement("language")
+        xmlMetadata.addElement("dc:language")
             .text = metadata.language
         xmlMetadata.addElement("meta")
             .addAttribute("name", "Sigil version")
